@@ -6,25 +6,29 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { usePrefs } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n/messages";
+import { PreferenceControls } from "./PreferenceControls";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/opportunities", label: "Job Opportunities", icon: Search },
-  { to: "/applications", label: "My Applications", icon: Briefcase },
-  { to: "/follow-ups", label: "Follow-ups", icon: BellRing },
-  { to: "/interview", label: "Interview Preparation", icon: MessagesSquare },
-  { to: "/skills", label: "Skills Development", icon: TrendingUp },
-  { to: "/portfolio", label: "Portfolio & Projects", icon: FolderGit2 },
-  { to: "/documents", label: "CV & Documents", icon: FileText },
-  { to: "/planner", label: "Daily Planner", icon: CalendarCheck },
-  { to: "/settings", label: "Settings", icon: Settings },
-] as const;
+  { to: "/dashboard", label: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/opportunities", label: "nav.opportunities", icon: Search },
+  { to: "/applications", label: "nav.applications", icon: Briefcase },
+  { to: "/follow-ups", label: "nav.followups", icon: BellRing },
+  { to: "/interview", label: "nav.interview", icon: MessagesSquare },
+  { to: "/skills", label: "nav.skills", icon: TrendingUp },
+  { to: "/portfolio", label: "nav.portfolio", icon: FolderGit2 },
+  { to: "/documents", label: "nav.documents", icon: FileText },
+  { to: "/planner", label: "nav.planner", icon: CalendarCheck },
+  { to: "/settings", label: "nav.settings", icon: Settings },
+] as const satisfies readonly { to: string; label: MessageKey; icon: unknown }[];
 
 export function AppShell() {
   const [open, setOpen] = useState(false);
   const { user } = useRouteContext({ from: "/_authenticated" });
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const { t } = usePrefs();
 
   async function signOut() {
     await qc.cancelQueries();
@@ -36,7 +40,7 @@ export function AppShell() {
   const sidebar = (
     <div className="flex h-full flex-col gap-6 p-5">
       <Link to="/dashboard" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-        <span className="flex size-9 items-center justify-center rounded-xl bg-hero text-primary-foreground"><Rocket className="size-5" /></span>
+        <span className="flex size-9 items-center justify-center rounded-xl bg-hero text-hero-foreground"><Rocket className="size-5" /></span>
         <span className="font-display text-lg font-semibold">Career Launchpad</span>
       </Link>
       <nav className="flex flex-1 flex-col gap-1">
@@ -48,14 +52,15 @@ export function AppShell() {
             className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
             activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}
           >
-            <Icon className="size-4.5" /> {label}
+            <Icon className="size-4.5" /> {t(label)}
           </Link>
         ))}
       </nav>
+      <PreferenceControls />
       <div className="rounded-xl bg-muted p-3 text-xs">
         <p className="truncate font-medium">{user.email}</p>
         <Button variant="ghost" size="sm" className="mt-2 w-full justify-start px-2" onClick={signOut}>
-          <LogOut className="size-4" /> Sign out
+          <LogOut className="size-4" /> {t("nav.signout")}
         </Button>
       </div>
     </div>
@@ -68,14 +73,14 @@ export function AppShell() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-foreground/30" onClick={() => setOpen(false)} />
           <aside className="relative h-full w-72 bg-sidebar shadow-xl">
-            <button className="absolute right-3 top-3 p-2" onClick={() => setOpen(false)} aria-label="Close menu"><X className="size-5" /></button>
+            <button className="absolute right-3 top-3 p-2" onClick={() => setOpen(false)} aria-label={t("nav.closeMenu")}><X className="size-5" /></button>
             {sidebar}
           </aside>
         </div>
       )}
       <div className="lg:pl-64">
         <header className="sticky top-0 z-40 flex items-center gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur lg:hidden">
-          <button onClick={() => setOpen(true)} aria-label="Open menu" className="p-1"><Menu className="size-5" /></button>
+          <button onClick={() => setOpen(true)} aria-label={t("nav.openMenu")} className="p-1"><Menu className="size-5" /></button>
           <span className="font-display font-semibold">Career Launchpad</span>
         </header>
         <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8"><Outlet /></main>

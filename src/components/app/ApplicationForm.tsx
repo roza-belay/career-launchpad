@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATUSES, computeFollowUp } from "@/lib/followup";
+import { usePrefs } from "@/lib/i18n";
+import { arrKey, statusKey } from "@/components/app/StatusBadge";
 import { useSaveApplication, type Application, type ApplicationInput } from "@/lib/data";
 
 const FIELDS = ["company","title","website","job_url","location","arrangement","salary_min","salary_max","applied_date","last_contact_date","next_follow_up","status","recruiter_name","recruiter_email","recruiter_phone","notes","cv_version","cover_letter","interview_date"] as const;
@@ -31,6 +33,7 @@ export function ApplicationForm({ open, onOpenChange, application, defaults }: {
   const [f, setF] = useState<F>(toForm(application));
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const save = useSaveApplication();
+  const { t } = usePrefs();
 
   useEffect(() => { if (open) { setF({ ...toForm(application), ...(application ? {} : (defaults ?? {})) } as F); setErrors({}); } }, [open, application]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -39,12 +42,12 @@ export function ApplicationForm({ open, onOpenChange, application, defaults }: {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const err: Partial<Record<Field, string>> = {};
-    if (!f.company.trim()) err.company = "Required";
-    if (!f.title.trim()) err.title = "Required";
-    if (!isUrl(f.website)) err.website = "Use a full URL (https://…)";
-    if (!isUrl(f.job_url)) err.job_url = "Use a full URL (https://…)";
-    if (f.recruiter_email && !/^\S+@\S+\.\S+$/.test(f.recruiter_email)) err.recruiter_email = "Invalid email";
-    if (f.salary_min && f.salary_max && Number(f.salary_min) > Number(f.salary_max)) err.salary_max = "Must be ≥ minimum";
+    if (!f.company.trim()) err.company = t("common.required");
+    if (!f.title.trim()) err.title = t("common.required");
+    if (!isUrl(f.website)) err.website = t("form.badUrl");
+    if (!isUrl(f.job_url)) err.job_url = t("form.badUrl");
+    if (f.recruiter_email && !/^\S+@\S+\.\S+$/.test(f.recruiter_email)) err.recruiter_email = t("form.badEmail");
+    if (f.salary_min && f.salary_max && Number(f.salary_min) > Number(f.salary_max)) err.salary_max = t("form.badSalary");
     setErrors(err);
     if (Object.keys(err).length) return;
     const n = (s: string) => (s ? Number(s) : null);
@@ -71,47 +74,47 @@ export function ApplicationForm({ open, onOpenChange, application, defaults }: {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader><DialogTitle>{application ? "Edit application" : "New application"}</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{t(application ? "form.edit" : "form.new")}</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
-            {field("company", "Company name *")}
-            {field("title", "Job title *")}
-            {field("website", "Company website", "url", { placeholder: "https://" })}
-            {field("job_url", "Job advertisement URL", "url", { placeholder: "https://" })}
-            {field("location", "Location", "text", { placeholder: "Stockholm" })}
+            {field("company", t("form.company"))}
+            {field("title", t("form.title"))}
+            {field("website", t("form.website"), "url", { placeholder: "https://" })}
+            {field("job_url", t("form.jobUrl"), "url", { placeholder: "https://" })}
+            {field("location", t("form.location"), "text", { placeholder: "Stockholm" })}
             <div className="space-y-1.5">
-              <Label>Work arrangement</Label>
+              <Label>{t("form.arrangement")}</Label>
               <Select value={f.arrangement} onValueChange={(v) => setF((p) => ({ ...p, arrangement: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{["Remote", "Hybrid", "On-site"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+                <SelectContent>{["Remote", "Hybrid", "On-site"].map((x) => <SelectItem key={x} value={x}>{t(arrKey(x))}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            {field("salary_min", "Salary min (SEK / month)", "number", { min: 0 })}
-            {field("salary_max", "Salary max (SEK / month)", "number", { min: 0 })}
+            {field("salary_min", t("form.salaryMin"), "number", { min: 0 })}
+            {field("salary_max", t("form.salaryMax"), "number", { min: 0 })}
             <div className="space-y-1.5">
-              <Label>Status</Label>
+              <Label>{t("form.status")}</Label>
               <Select value={f.status} onValueChange={(v) => setF((p) => ({ ...p, status: v }))}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{STATUSES.map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+                <SelectContent>{STATUSES.map((x) => <SelectItem key={x} value={x}>{t(statusKey(x))}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            {field("applied_date", "Application date", "date")}
-            {field("last_contact_date", "Last contact date", "date")}
+            {field("applied_date", t("form.applied"), "date")}
+            {field("last_contact_date", t("form.lastContact"), "date")}
             <div className="space-y-1.5">
-              {field("next_follow_up", "Next follow-up", "date")}
-              <p className="text-xs text-muted-foreground">Leave empty to set 7 days after last contact.</p>
+              {field("next_follow_up", t("form.nextFollow"), "date")}
+              <p className="text-xs text-muted-foreground">{t("form.nextHint")}</p>
             </div>
-            {field("interview_date", "Interview date", "datetime-local")}
-            {field("cv_version", "CV version used")}
-            {field("recruiter_name", "Recruiter name")}
-            {field("recruiter_email", "Recruiter email", "email")}
-            {field("recruiter_phone", "Recruiter phone", "tel")}
+            {field("interview_date", t("form.interview"), "datetime-local")}
+            {field("cv_version", t("form.cv"))}
+            {field("recruiter_name", t("form.recName"))}
+            {field("recruiter_email", t("form.recEmail"), "email")}
+            {field("recruiter_phone", t("form.recPhone"), "tel")}
           </div>
-          <div className="space-y-1.5"><Label htmlFor="cover_letter">Cover letter</Label><Textarea id="cover_letter" rows={3} value={f.cover_letter} onChange={set("cover_letter")} /></div>
-          <div className="space-y-1.5"><Label htmlFor="notes">Notes</Label><Textarea id="notes" rows={3} value={f.notes} onChange={set("notes")} /></div>
+          <div className="space-y-1.5"><Label htmlFor="cover_letter">{t("form.cover")}</Label><Textarea id="cover_letter" rows={3} value={f.cover_letter} onChange={set("cover_letter")} /></div>
+          <div className="space-y-1.5"><Label htmlFor="notes">{t("form.notes")}</Label><Textarea id="notes" rows={3} value={f.notes} onChange={set("notes")} /></div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
+            <Button type="submit" disabled={save.isPending}>{save.isPending ? t("common.saving") : t("common.save")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

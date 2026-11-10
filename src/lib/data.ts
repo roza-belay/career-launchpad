@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { translate } from "@/lib/i18n/core";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Application = Database["public"]["Tables"]["applications"]["Row"];
@@ -9,7 +10,7 @@ export type FollowUp = Database["public"]["Tables"]["follow_ups"]["Row"];
 export type PlannerTask = Database["public"]["Tables"]["planner_tasks"]["Row"];
 export type WeeklyGoal = Database["public"]["Tables"]["weekly_goals"]["Row"];
 
-const fail = (e: unknown) => toast.error(e instanceof Error ? e.message : "Something went wrong");
+const fail = (e: unknown) => toast.error(e instanceof Error ? e.message : translate("common.error"));
 
 export function useApplications() {
   return useQuery({
@@ -30,7 +31,7 @@ export function useSaveApplication() {
       const { error } = await q;
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["applications"] }); toast.success("Application saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["applications"] }); toast.success(translate("apps.savedToast")); },
     onError: fail,
   });
 }
@@ -54,7 +55,7 @@ export function useDeleteApplication() {
       const { error } = await supabase.from("applications").delete().in("id", ids);
       if (error) throw error;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["applications"] }); toast.success("Deleted"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["applications"] }); toast.success(translate("common.deleted")); },
     onError: fail,
   });
 }
@@ -83,7 +84,7 @@ export function useConfirmFollowUp() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["applications"] });
       qc.invalidateQueries({ queryKey: ["follow_ups"] });
-      toast.success("Follow-up recorded");
+      toast.success(translate("fu.recorded"));
     },
     onError: fail,
   });

@@ -1,5 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Rocket, Briefcase, BellRing, CalendarCheck } from "lucide-react";
+import { usePrefs } from "@/lib/i18n";
+import { PreferenceControls } from "@/components/app/PreferenceControls";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -23,16 +25,18 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const { t } = usePrefs();
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
-      <span className="flex size-14 items-center justify-center rounded-2xl bg-hero text-primary-foreground shadow-soft"><Rocket className="size-7" /></span>
-      <h1 className="mt-6 max-w-2xl text-4xl font-semibold sm:text-5xl">Your personal launchpad to a first frontend role</h1>
-      <p className="mt-4 max-w-xl text-muted-foreground">Applications, follow-ups and daily goals — all in one private space.</p>
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
+      <PreferenceControls className="absolute right-4 top-4" />
+      <span className="flex size-14 items-center justify-center rounded-2xl bg-hero text-hero-foreground shadow-soft"><Rocket className="size-7" /></span>
+      <h1 className="mt-6 max-w-2xl text-4xl font-semibold sm:text-5xl">{t("landing.title")}</h1>
+      <p className="mt-4 max-w-xl text-muted-foreground">{t("landing.sub")}</p>
       <div className="mt-8 flex gap-3">
-        <Button asChild size="lg"><Link to="/auth">Sign in</Link></Button>
+        <Button asChild size="lg"><Link to="/auth">{t("landing.signin")}</Link></Button>
       </div>
       <div className="mt-14 grid max-w-3xl gap-4 sm:grid-cols-3">
-        {[[Briefcase, "Application tracker"], [BellRing, "Smart follow-ups"], [CalendarCheck, "Daily planner"]].map(([Icon, l]) => {
+        {[[Briefcase, t("landing.f1")], [BellRing, t("landing.f2")], [CalendarCheck, t("landing.f3")]].map(([Icon, l]) => {
           const I = Icon as typeof Briefcase;
           return <div key={l as string} className="card-soft flex items-center gap-3 p-4 text-sm font-medium"><I className="size-5 text-primary" />{l as string}</div>;
         })}
