@@ -1,0 +1,97 @@
+import { Link, Outlet, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import {
+  LayoutDashboard, Search, Briefcase, BellRing, MessagesSquare, TrendingUp, FolderGit2, FileText, CalendarCheck, Settings, LogOut, Menu, Rocket, X,
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+
+const NAV = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/opportunities", label: "Job Opportunities", icon: Search },
+  { to: "/applications", label: "My Applications", icon: Briefcase },
+  { to: "/follow-ups", label: "Follow-ups", icon: BellRing },
+  { to: "/interview", label: "Interview Preparation", icon: MessagesSquare },
+  { to: "/skills", label: "Skills Development", icon: TrendingUp },
+  { to: "/portfolio", label: "Portfolio & Projects", icon: FolderGit2 },
+  { to: "/documents", label: "CV & Documents", icon: FileText },
+  { to: "/planner", label: "Daily Planner", icon: CalendarCheck },
+  { to: "/settings", label: "Settings", icon: Settings },
+] as const;
+
+export function AppShell() {
+  const [open, setOpen] = useState(false);
+  const { user } = useRouteContext({ from: "/_authenticated" });
+  const qc = useQueryClient();
+  const navigate = useNavigate();
+
+  async function signOut() {
+    await qc.cancelQueries();
+    qc.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
+  const sidebar = (
+    <div className="flex h-full flex-col gap-6 p-5">
+      <Link to="/dashboard" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+        <span className="flex size-9 items-center justify-center rounded-xl bg-hero text-primary-foreground"><Rocket className="size-5" /></span>
+        <span className="font-display text-lg font-semibold">Career Launchpad</span>
+      </Link>
+      <nav className="flex flex-1 flex-col gap-1">
+        {NAV.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
+            activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}
+          >
+            <Icon className="size-4.5" /> {label}
+          </Link>
+        ))}
+      </nav>
+      <div className="rounded-xl bg-muted p-3 text-xs">
+        <p className="truncate font-medium">{user.email}</p>
+        <Button variant="ghost" size="sm" className="mt-2 w-full justify-start px-2" onClick={signOut}>
+          <LogOut className="size-4" /> Sign out
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-background">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-sidebar-border bg-sidebar lg:block">{sidebar}</aside>
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-foreground/30" onClick={() => setOpen(false)} />
+          <aside className="relative h-full w-72 bg-sidebar shadow-xl">
+            <button className="absolute right-3 top-3 p-2" onClick={() => setOpen(false)} aria-label="Close menu"><X className="size-5" /></button>
+            {sidebar}
+          </aside>
+        </div>
+      )}
+      <div className="lg:pl-64">
+        <header className="sticky top-0 z-40 flex items-center gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur lg:hidden">
+          <button onClick={() => setOpen(true)} aria-label="Open menu" className="p-1"><Menu className="size-5" /></button>
+          <span className="font-display font-semibold">Career Launchpad</span>
+        </header>
+        <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8"><Outlet /></main>
+      </div>
+    </div>
+  );
+}
+
+export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
+  return (
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-semibold sm:text-3xl">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}

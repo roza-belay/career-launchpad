@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- App pages live under `src/routes/_authenticated/` and read/write via the browser client with per-user RLS; why: private personal data, no server functions needed.
+- Follow-up date logic lives in `src/lib/followup.ts` (tested) and a DB trigger mirrors it; why: one rule, enforced on every write.
+- New users get demo rows (is_demo = true) from a signup trigger; why: demo data must be clearly separable from real data.
