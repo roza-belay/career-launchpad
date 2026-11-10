@@ -40,6 +40,10 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
+  --color-paper: var(--paper);
+  --color-paper-foreground: var(--paper-foreground);
+  --color-paper-muted: var(--paper-muted);
+  --color-paper-accent: var(--paper-accent);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
@@ -91,6 +95,11 @@
 
 :root {
   --radius: 1rem;
+  /* CV sheet is always printed paper, in both themes */
+  --paper: oklch(1 0 0);
+  --paper-foreground: oklch(0.22 0.02 285);
+  --paper-muted: oklch(0.45 0.02 285);
+  --paper-accent: oklch(0.45 0.14 295);
   --hero-foreground: oklch(0.99 0 0);
   --background: oklch(0.985 0.004 290);
   --foreground: oklch(0.24 0.03 285);
@@ -207,3 +216,15 @@
 @utility bg-hero { background-image: var(--gradient-hero); }
 @utility card-soft { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-soft); }
 @layer base { h1,h2,h3 { font-family: var(--font-display); letter-spacing: -0.02em; } body { font-family: var(--font-sans); } }
+
+/* CV PDF export: a portal copy of the sheet is the only thing printed */
+.cv-print-only { display: none; }
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body > *:not(.cv-print-only) { display: none !important; }
+  .cv-print-only { display: block; background: var(--paper); }
+  .cv-print-only .cv-sheet { font-size: 9.5pt; line-height: 1.45; }
+  .cv-print-only .cv-sheet { max-width: none; box-shadow: none; border: 0; border-radius: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { height: auto !important; min-height: 0 !important; background: var(--paper) !important; }
+  .cv-sheet li { break-inside: avoid; }
+}

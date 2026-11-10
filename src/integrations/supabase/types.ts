@@ -95,6 +95,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cv_documents: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          kind: string
+          language: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          language?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          language?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       follow_ups: {
         Row: {
           application_id: string

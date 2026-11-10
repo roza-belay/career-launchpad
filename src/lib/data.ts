@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { translate } from "@/lib/i18n/core";
+import type { MessageKey } from "@/lib/i18n/messages";
 import type { Database } from "@/integrations/supabase/types";
 
 export type Application = Database["public"]["Tables"]["applications"]["Row"];
@@ -115,6 +116,31 @@ export function usePlannerMutation<T>(fn: (v: T) => Promise<{ error: unknown }>)
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["planner"] }),
+    onError: fail,
+  });
+}
+
+export type CvDocument = Database["public"]["Tables"]["cv_documents"]["Row"];
+
+export function useCvDocuments() {
+  return useQuery({
+    queryKey: ["cv_documents"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cv_documents").select("*").order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useCvMutation<T>(fn: (v: T) => Promise<{ error: unknown }>, successKey?: MessageKey) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (v: T) => {
+      const { error } = await fn(v);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["cv_documents"] }); if (successKey) toast.success(translate(successKey)); },
     onError: fail,
   });
 }
