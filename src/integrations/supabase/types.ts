@@ -288,6 +288,68 @@ export type Database = {
           },
         ]
       }
+      vacancies: {
+        Row: {
+          application_id: string | null
+          arrangement: string
+          company: string
+          created_at: string
+          deadline: string | null
+          description: string | null
+          employment_type: string
+          id: string
+          job_url: string | null
+          location: string | null
+          saved_on: string
+          skills: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id?: string | null
+          arrangement?: string
+          company: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          employment_type?: string
+          id?: string
+          job_url?: string | null
+          location?: string | null
+          saved_on?: string
+          skills?: string[]
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          application_id?: string | null
+          arrangement?: string
+          company?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          employment_type?: string
+          id?: string
+          job_url?: string | null
+          location?: string | null
+          saved_on?: string
+          skills?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vacancies_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_goals: {
         Row: {
           created_at: string

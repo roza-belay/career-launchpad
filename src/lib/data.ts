@@ -181,3 +181,30 @@ export function useScreenshotUrls(paths: string[]) {
     },
   });
 }
+
+export function useVacancies() {
+  return useQuery({
+    queryKey: ["vacancies"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("vacancies").select("*").order("saved_on", { ascending: false }).order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useVacancyMutation<T>(fn: (v: T) => Promise<{ error: unknown }>, successKey?: MessageKey) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (v: T) => {
+      const { error } = await fn(v);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["vacancies"] });
+      qc.invalidateQueries({ queryKey: ["applications"] });
+      if (successKey) toast.success(translate(successKey));
+    },
+    onError: fail,
+  });
+}
