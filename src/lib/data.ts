@@ -208,3 +208,46 @@ export function useVacancyMutation<T>(fn: (v: T) => Promise<{ error: unknown }>,
     onError: fail,
   });
 }
+
+export type Skill = Database["public"]["Tables"]["skills"]["Row"];
+export type LearningGoal = Database["public"]["Tables"]["learning_goals"]["Row"];
+export type InterviewQuestion = Database["public"]["Tables"]["interview_questions"]["Row"];
+
+export function useSkills() {
+  return useQuery({
+    queryKey: ["skills"],
+    queryFn: async () => {
+      const [s, g] = await Promise.all([
+        supabase.from("skills").select("*").order("created_at").order("name"),
+        supabase.from("learning_goals").select("*").order("done").order("target_date", { nullsFirst: false }),
+      ]);
+      if (s.error) throw s.error;
+      if (g.error) throw g.error;
+      return { skills: s.data, goals: g.data };
+    },
+  });
+}
+
+export function useInterviewQuestions() {
+  return useQuery({
+    queryKey: ["interview"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("interview_questions").select("*").order("created_at").order("preset_key");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+/** Generic mutation that invalidates one query key. */
+export function useKeyedMutation<T>(key: string, fn: (v: T) => Promise<{ error: unknown }>, successKey?: MessageKey) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (v: T) => {
+      const { error } = await fn(v);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [key] }); if (successKey) toast.success(translate(successKey)); },
+    onError: fail,
+  });
+}

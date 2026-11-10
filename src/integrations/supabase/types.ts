@@ -163,6 +163,80 @@ export type Database = {
           },
         ]
       }
+      interview_questions: {
+        Row: {
+          answer: string | null
+          category: string
+          created_at: string
+          id: string
+          preset_key: string | null
+          question: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          preset_key?: string | null
+          question?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          answer?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          preset_key?: string | null
+          question?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      learning_goals: {
+        Row: {
+          created_at: string
+          done: boolean
+          id: string
+          skill_id: string | null
+          target_date: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          id?: string
+          skill_id?: string | null
+          target_date?: string | null
+          title: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          id?: string
+          skill_id?: string | null
+          target_date?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_goals_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       planner_tasks: {
         Row: {
           created_at: string
@@ -254,6 +328,51 @@ export type Database = {
           status?: string
           technologies?: string[]
           title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string
+          created_at: string
+          goal: string | null
+          id: string
+          improving: boolean
+          is_custom: boolean
+          level: string | null
+          name: string
+          notes: string | null
+          progress: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          goal?: string | null
+          id?: string
+          improving?: boolean
+          is_custom?: boolean
+          level?: string | null
+          name: string
+          notes?: string | null
+          progress?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          goal?: string | null
+          id?: string
+          improving?: boolean
+          is_custom?: boolean
+          level?: string | null
+          name?: string
+          notes?: string | null
+          progress?: number
           updated_at?: string
           user_id?: string
         }
@@ -382,7 +501,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      seed_skills_and_questions: { Args: { _uid: string }; Returns: undefined }
     }
     Enums: {
       app_status: "SAVED" | "APPLIED" | "INTERVIEWING" | "OFFER" | "CLOSED"

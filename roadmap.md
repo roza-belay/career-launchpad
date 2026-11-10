@@ -5,5 +5,5 @@
 - [x] Portfolio & Projects (cards, details, screenshots, recruiter-ready checklist)
 - [ ] CV & Documents extras: cover letters, profile links, recruiter messages, application templates
 - [x] Job Opportunities (manual vacancies, filters, move to My Applications)
-- [ ] Interview Preparation
-- [ ] Skills Development
+- [x] Interview Preparation (questions, tips, own answers, practice status)
+- [x] Skills Development (skills, progress, learning goals)
