@@ -20,9 +20,11 @@ import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
 import { Route as AuthenticatedOpportunitiesRouteImport } from './routes/_authenticated/opportunities'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
-import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
+import { Route as AuthenticatedPortfolioRouteRouteImport } from './routes/_authenticated/portfolio/route'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
+import { Route as AuthenticatedPortfolioIndexRouteImport } from './routes/_authenticated/portfolio/index'
+import { Route as AuthenticatedPortfolioIdRouteImport } from './routes/_authenticated/portfolio/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -80,11 +82,12 @@ const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
   path: '/planner',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
+const AuthenticatedPortfolioRouteRoute =
+  AuthenticatedPortfolioRouteRouteImport.update({
+    id: '/portfolio',
+    path: '/portfolio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -95,11 +98,24 @@ const AuthenticatedSkillsRoute = AuthenticatedSkillsRouteImport.update({
   path: '/skills',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPortfolioIndexRoute =
+  AuthenticatedPortfolioIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPortfolioRouteRoute,
+  } as any)
+const AuthenticatedPortfolioIdRoute =
+  AuthenticatedPortfolioIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedPortfolioRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/portfolio': typeof AuthenticatedPortfolioRouteRouteWithChildren
   '/applications': typeof AuthenticatedApplicationsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
@@ -107,9 +123,10 @@ export interface FileRoutesByFullPath {
   '/interview': typeof AuthenticatedInterviewRoute
   '/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/planner': typeof AuthenticatedPlannerRoute
-  '/portfolio': typeof AuthenticatedPortfolioRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
+  '/portfolio/$id': typeof AuthenticatedPortfolioIdRoute
+  '/portfolio/': typeof AuthenticatedPortfolioIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -122,9 +139,10 @@ export interface FileRoutesByTo {
   '/interview': typeof AuthenticatedInterviewRoute
   '/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/planner': typeof AuthenticatedPlannerRoute
-  '/portfolio': typeof AuthenticatedPortfolioRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
+  '/portfolio/$id': typeof AuthenticatedPortfolioIdRoute
+  '/portfolio': typeof AuthenticatedPortfolioIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,6 +150,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/portfolio': typeof AuthenticatedPortfolioRouteRouteWithChildren
   '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
@@ -139,9 +158,10 @@ export interface FileRoutesById {
   '/_authenticated/interview': typeof AuthenticatedInterviewRoute
   '/_authenticated/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
-  '/_authenticated/portfolio': typeof AuthenticatedPortfolioRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/skills': typeof AuthenticatedSkillsRoute
+  '/_authenticated/portfolio/$id': typeof AuthenticatedPortfolioIdRoute
+  '/_authenticated/portfolio/': typeof AuthenticatedPortfolioIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,6 +169,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/portfolio'
     | '/applications'
     | '/dashboard'
     | '/documents'
@@ -156,9 +177,10 @@ export interface FileRouteTypes {
     | '/interview'
     | '/opportunities'
     | '/planner'
-    | '/portfolio'
     | '/settings'
     | '/skills'
+    | '/portfolio/$id'
+    | '/portfolio/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,15 +193,17 @@ export interface FileRouteTypes {
     | '/interview'
     | '/opportunities'
     | '/planner'
-    | '/portfolio'
     | '/settings'
     | '/skills'
+    | '/portfolio/$id'
+    | '/portfolio'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/portfolio'
     | '/_authenticated/applications'
     | '/_authenticated/dashboard'
     | '/_authenticated/documents'
@@ -187,9 +211,10 @@ export interface FileRouteTypes {
     | '/_authenticated/interview'
     | '/_authenticated/opportunities'
     | '/_authenticated/planner'
-    | '/_authenticated/portfolio'
     | '/_authenticated/settings'
     | '/_authenticated/skills'
+    | '/_authenticated/portfolio/$id'
+    | '/_authenticated/portfolio/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -282,7 +307,7 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/portfolio'
       path: '/portfolio'
       fullPath: '/portfolio'
-      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
+      preLoaderRoute: typeof AuthenticatedPortfolioRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -299,10 +324,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSkillsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/portfolio/': {
+      id: '/_authenticated/portfolio/'
+      path: '/'
+      fullPath: '/portfolio/'
+      preLoaderRoute: typeof AuthenticatedPortfolioIndexRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRouteRoute
+    }
+    '/_authenticated/portfolio/$id': {
+      id: '/_authenticated/portfolio/$id'
+      path: '/$id'
+      fullPath: '/portfolio/$id'
+      preLoaderRoute: typeof AuthenticatedPortfolioIdRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRouteRoute
+    }
   }
 }
 
+interface AuthenticatedPortfolioRouteRouteChildren {
+  AuthenticatedPortfolioIdRoute: typeof AuthenticatedPortfolioIdRoute
+  AuthenticatedPortfolioIndexRoute: typeof AuthenticatedPortfolioIndexRoute
+}
+
+const AuthenticatedPortfolioRouteRouteChildren: AuthenticatedPortfolioRouteRouteChildren =
+  {
+    AuthenticatedPortfolioIdRoute: AuthenticatedPortfolioIdRoute,
+    AuthenticatedPortfolioIndexRoute: AuthenticatedPortfolioIndexRoute,
+  }
+
+const AuthenticatedPortfolioRouteRouteWithChildren =
+  AuthenticatedPortfolioRouteRoute._addFileChildren(
+    AuthenticatedPortfolioRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPortfolioRouteRoute: typeof AuthenticatedPortfolioRouteRouteWithChildren
   AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
@@ -310,12 +366,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
   AuthenticatedOpportunitiesRoute: typeof AuthenticatedOpportunitiesRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
-  AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPortfolioRouteRoute:
+    AuthenticatedPortfolioRouteRouteWithChildren,
   AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
@@ -323,7 +380,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
   AuthenticatedOpportunitiesRoute: AuthenticatedOpportunitiesRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
-  AuthenticatedPortfolioRoute: AuthenticatedPortfolioRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
 }

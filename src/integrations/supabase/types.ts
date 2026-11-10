@@ -187,6 +187,78 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          category: string | null
+          challenges: string | null
+          checklist: Json
+          created_at: string
+          demo_url: string | null
+          description: string | null
+          docs_url: string | null
+          end_date: string | null
+          features: string[]
+          github_url: string | null
+          id: string
+          is_public: boolean
+          role: string | null
+          screenshots: string[]
+          short_description: string | null
+          start_date: string | null
+          status: string
+          technologies: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          challenges?: string | null
+          checklist?: Json
+          created_at?: string
+          demo_url?: string | null
+          description?: string | null
+          docs_url?: string | null
+          end_date?: string | null
+          features?: string[]
+          github_url?: string | null
+          id?: string
+          is_public?: boolean
+          role?: string | null
+          screenshots?: string[]
+          short_description?: string | null
+          start_date?: string | null
+          status?: string
+          technologies?: string[]
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          category?: string | null
+          challenges?: string | null
+          checklist?: Json
+          created_at?: string
+          demo_url?: string | null
+          description?: string | null
+          docs_url?: string | null
+          end_date?: string | null
+          features?: string[]
+          github_url?: string | null
+          id?: string
+          is_public?: boolean
+          role?: string | null
+          screenshots?: string[]
+          short_description?: string | null
+          start_date?: string | null
+          status?: string
+          technologies?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_completions: {
         Row: {
           done_on: string

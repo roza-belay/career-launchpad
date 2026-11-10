@@ -15,6 +15,13 @@
       "when": 1794340395921,
       "tag": "0001_cv_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794342513958,
+      "tag": "0002_portfolio_projects",
+      "breakpoints": true
     }
   ]
 }

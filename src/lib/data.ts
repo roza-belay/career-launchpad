@@ -144,3 +144,40 @@ export function useCvMutation<T>(fn: (v: T) => Promise<{ error: unknown }>, succ
     onError: fail,
   });
 }
+
+export function useProjects() {
+  return useQuery({
+    queryKey: ["projects"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("projects").select("*").order("created_at");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useProjectMutation<T>(fn: (v: T) => Promise<{ error: unknown }>, successKey?: MessageKey) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (v: T) => {
+      const { error } = await fn(v);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["projects"] }); if (successKey) toast.success(translate(successKey)); },
+    onError: fail,
+  });
+}
+
+/** Short-lived signed URLs for private screenshot paths. */
+export function useScreenshotUrls(paths: string[]) {
+  return useQuery({
+    queryKey: ["shot-urls", paths],
+    enabled: paths.length > 0,
+    staleTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage.from("project-screenshots").createSignedUrls(paths, 3600);
+      if (error) throw error;
+      return Object.fromEntries(data.map((d) => [d.path ?? "", d.signedUrl]));
+    },
+  });
+}

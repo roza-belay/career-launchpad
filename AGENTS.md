@@ -35,3 +35,4 @@ use the editor.
 - New users get demo rows (is_demo = true) from a signup trigger; why: demo data must be clearly separable from real data.
 - UI strings live in `src/lib/i18n/messages.ts` (sv must cover every en key, tested) and are read via `usePrefs().t`; language/theme persist in localStorage and apply via a pre-hydration script; why: no i18n dependency, no theme flash.
 - CVs are stored as structured JSON per version (`cv_documents.content`, shape in `src/lib/cv.ts`) and exported to PDF via the browser print dialog from a body-level portal copy of `CvSheet`; why: one renderer for preview and PDF, no PDF dependency.
+- Portfolio projects live in `projects` (unique per user+title) with screenshots in the private `project-screenshots` bucket under `<user_id>/<project_id>/`, shown via signed URLs; checklist rules in `src/lib/portfolio.ts` (tested); why: private by default, `is_public` only records intent to publish later.
