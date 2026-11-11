@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate, useRouteContext } from "@tanstack/react-rout
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  LayoutDashboard, Search, Briefcase, BellRing, MessagesSquare, TrendingUp, FolderGit2, FileText, CalendarCheck, Settings, LogOut, Menu, Rocket, X,
+  LayoutDashboard, Search, Briefcase, BellRing, MessagesSquare, TrendingUp, FolderGit2, FileText, CalendarCheck, Settings, LogOut, Menu, Rocket, X, Compass,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ const NAV = [
   { to: "/portfolio", label: "nav.portfolio", icon: FolderGit2 },
   { to: "/documents", label: "nav.documents", icon: FileText },
   { to: "/planner", label: "nav.planner", icon: CalendarCheck },
+  { to: "/growth", label: "nav.growth", icon: Compass },
   { to: "/settings", label: "nav.settings", icon: Settings },
 ] as const satisfies readonly { to: string; label: MessageKey; icon: unknown }[];
 

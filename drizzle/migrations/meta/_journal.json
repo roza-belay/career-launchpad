@@ -50,6 +50,13 @@
       "when": 1794394196304,
       "tag": "0006_career_profile_and_expanded_development_presets",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794430012810,
+      "tag": "0007_growth_items",
+      "breakpoints": true
     }
   ]
 }

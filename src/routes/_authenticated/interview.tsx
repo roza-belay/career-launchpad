@@ -15,6 +15,7 @@ import { usePrefs } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/messages";
 import { PRACTICE_STATUSES, QUESTION_CATEGORIES, practiceProgress } from "@/lib/skills";
 import { cn } from "@/lib/utils";
+import { AiCoach } from "@/components/app/AiCoach";
 
 const META = "Practise HTML, CSS, JavaScript, React, TypeScript and HR interview questions with your own answers and practice status.";
 export const Route = createFileRoute("/_authenticated/interview")({
@@ -83,6 +84,7 @@ function QuestionCard({ q, onEdit }: { q: InterviewQuestion; onEdit: () => void 
       </div>
       {tip && <p className="flex gap-1.5 text-xs text-muted-foreground"><Lightbulb className="size-3.5 shrink-0 text-primary" /><span><b>{t("iq.tip")}:</b> {tip}</span></p>}
       <p className={cn("whitespace-pre-line text-sm", !q.answer && "italic text-muted-foreground")}>{q.answer || t("iq.noAnswer")}</p>
+      <AiCoach question={text} answer={q.answer} />
       <div className="mt-auto flex flex-wrap gap-1.5" role="group" aria-label={t("iq.f.status")}>
         {PRACTICE_STATUSES.map((s) => (
           <button key={s} type="button" aria-pressed={q.status === s} onClick={() => setStatus.mutate(s)}

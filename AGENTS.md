@@ -41,3 +41,5 @@ use the editor.
 - Career profiles are owner-scoped rows separate from CV versions; role matching and multi-selection live in `src/lib/career.ts`; why: editable career targets without overwriting source CVs or changing existing vacancy filters.
 - Expanded presets are inserted only when missing, through a restricted database helper for signup and explicit account updates; why: preserve existing skill progress, answers and custom content.
 - Source-export screenshots belong in `screenshots/` only when explicitly selected for Git export; keep account uploads in private storage and never commit signed URLs; why: documentation exports must not bulk-publish personal files.
+- Career Growth Hub items share one owner-scoped `growth_items` table keyed by hub; next-step rules in `src/lib/growth.ts` (tested); why: one generic store for several planning hubs.
+- AI interview feedback runs in an authenticated server function via the AI Gateway SDK and is not stored; why: keep prompts server-side and never persist generated text as user data.

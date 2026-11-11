@@ -187,6 +187,42 @@ export type Database = {
           },
         ]
       }
+      growth_items: {
+        Row: {
+          created_at: string
+          details: string | null
+          hub: string
+          id: string
+          status: string
+          target_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          hub: string
+          id?: string
+          status?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          hub?: string
+          id?: string
+          status?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       interview_questions: {
         Row: {
           answer: string | null

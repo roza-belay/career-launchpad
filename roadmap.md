@@ -10,6 +10,7 @@
 - [x] CV versions: Swedish main, English international, tailored copies, PDF export
 - [x] Portfolio & Projects (cards, details, screenshots, recruiter-ready checklist)
 - [ ] CV & Documents extras: cover letters, profile links, recruiter messages, application templates
+- [x] Career Growth Hub (roadmap, career change, strengths, LinkedIn, salary, entrepreneurship) + AI interview feedback + sapphire palette
 - [x] Job Opportunities (manual vacancies, filters, move to My Applications)
 - [x] Interview Preparation (questions, tips, own answers, practice status)
 - [x] Skills Development (skills, progress, learning goals)
