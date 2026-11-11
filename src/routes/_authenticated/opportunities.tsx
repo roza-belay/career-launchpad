@@ -6,13 +6,15 @@ import { PageHeader } from "@/components/app/AppShell";
 import { StatusBadge, arrKey } from "@/components/app/StatusBadge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CAREER_ROLES, matchesCareerRoles, toggleCareerRole } from "@/lib/career";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { useApplications, useVacancies, useVacancyMutation, type Application } from "@/lib/data";
+import { useApplications, useCareerProfile, useVacancies, useVacancyMutation, type Application } from "@/lib/data";
 import { toISODate } from "@/lib/followup";
 import { usePrefs } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/messages";
@@ -22,7 +24,7 @@ import { cn } from "@/lib/utils";
 
 const META = "Save vacancies from LinkedIn and career pages, filter them and move them into My Applications.";
 export const Route = createFileRoute("/_authenticated/opportunities")({
-  head: () => ({ meta: [{ title: "Job Opportunities — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Job Opportunities" }, { property: "og:description", content: META }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Job Opportunities — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Job Opportunities" }, { property: "og:description", content: META }] }),
   component: OpportunitiesPage,
 });
 const etKey = (s: string) => `vac.et.${s}` as MessageKey;
@@ -33,8 +35,10 @@ function OpportunitiesPage() {
   const { data: apps = [] } = useApplications();
   const [q, setQ] = useState("");
   const [filters, setFilters] = useState<string[]>([]);
+  const [roles, setRoles] = useState<string[]>([]);
+  const { data: profile } = useCareerProfile();
   const [editing, setEditing] = useState<Vacancy | null | undefined>(undefined);
-  const shown = vacancies.filter((v) => matchesVacancy(v, q, filters));
+  const shown = vacancies.filter((v) => matchesVacancy(v, q, filters) && matchesCareerRoles(v, roles));
   const toggle = (k: string) => setFilters((f) => (f.includes(k) ? f.filter((x) => x !== k) : [...f, k]));
 
   return (
@@ -52,9 +56,16 @@ function OpportunitiesPage() {
               {t(f.label)}
             </button>
           ))}
-          {filters.length > 0 && <Button size="sm" variant="ghost" onClick={() => setFilters([])}>{t("vac.clear")}</Button>}
+          {(filters.length > 0 || roles.length > 0) && <Button size="sm" variant="ghost" onClick={() => { setFilters([]); setRoles([]); }}>{t("vac.clear")}</Button>}
           <span className="ml-auto text-xs text-muted-foreground">{t("vac.count", { n: shown.length, t: vacancies.length })}</span>
         </div>
+        <details>
+          <summary className="cursor-pointer text-sm font-medium">{t("career.filter")} {roles.length > 0 && `(${roles.length})`}</summary>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {CAREER_ROLES.map((role) => <label key={role} className="flex items-start gap-2 text-sm"><Checkbox checked={roles.includes(role)} onCheckedChange={() => setRoles((r) => toggleCareerRole(r, role))} />{t(`career.role.${role}`)}</label>)}
+          </div>
+          <Button className="mt-3" size="sm" variant="secondary" disabled={!profile?.preferred_roles.length} onClick={() => setRoles(profile?.preferred_roles ?? [])}>{t("career.preferred")}</Button>
+        </details>
       </div>
       <p className="mb-4 text-xs text-muted-foreground">{t("vac.manualNote")}</p>
 
@@ -107,10 +118,10 @@ function VacancyCard({ v, apps, onEdit }: { v: Vacancy; apps: Application[]; onE
         <span>{t(arrKey(v.arrangement))} · {t(etKey(v.employment_type))}</span>
         <span>{t("vac.savedOn", { d: date(v.saved_on) })}</span>
       </div>
-      {v.deadline && (
+      {v.deadline && days !== null && (
         <p className={cn("inline-flex items-center gap-1.5 text-xs font-medium", days !== null && days < 0 ? "text-muted-foreground line-through" : days !== null && days <= 3 ? "text-destructive" : "text-foreground")}>
           <CalendarClock className="size-3.5" />{t("vac.deadline", { d: date(v.deadline) })}
-          <span className="no-underline">· {days! < 0 ? t("vac.deadlinePassed") : days === 0 ? t("vac.today") : t("vac.daysLeft", { n: days! })}</span>
+          <span className="no-underline">· {days < 0 ? t("vac.deadlinePassed") : days === 0 ? t("vac.today") : t("vac.daysLeft", { n: days })}</span>
         </p>
       )}
       {v.skills.length > 0 && <div className="flex flex-wrap gap-1.5">{v.skills.map((s) => <span key={s} className="rounded-md bg-primary-soft px-2 py-0.5 text-xs font-medium text-accent-foreground">{s}</span>)}</div>}

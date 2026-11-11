@@ -1,4 +1,8 @@
 # Roadmap
+- [x] Broader career roles and editable private career profile
+- [x] Expanded skills and interview categories without overwriting existing records
+- [x] Genuine Career Launchpad screenshots and coordinated feature testing
+- [ ] POS genuine screenshot: needs a verified source screenshot; supplied device composition cannot establish provenance
 - [x] Dashboard, Applications (table + Kanban), Follow-ups, Daily Planner, login
 - [x] Swedish/English UI + dark/light mode
 - [x] CV versions: Swedish main, English international, tailored copies, PDF export

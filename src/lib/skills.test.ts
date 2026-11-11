@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { averageProgress, clampProgress, practiceProgress, progressByCategory, recentlyUpdated } from "./skills";
+import { SKILL_CATEGORIES, QUESTION_CATEGORIES, averageProgress, clampProgress, practiceProgress, progressByCategory, recentlyUpdated } from "./skills";
 
 describe("skills", () => {
+  it("keeps existing categories and includes the six new skill groups", () => { expect(SKILL_CATEGORIES).toEqual(["FRONTEND", "TOOLS", "SECURITY", "ADDITIONAL", "BACKEND", "API", "AI", "TESTING", "CLOUD", "MOBILE"]); });
+  it("includes all ten new interview categories", () => { expect(QUESTION_CATEGORIES).toEqual(expect.arrayContaining(["BACKEND", "KOTLIN", "PYTHON", "NODEJS", "REST", "SQL", "AI", "TESTING", "ANDROID", "GIT"])); });
   it("clamps progress to 0–100", () => {
     expect(clampProgress(150)).toBe(100);
     expect(clampProgress(-5)).toBe(0);

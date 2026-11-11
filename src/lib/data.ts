@@ -213,6 +213,17 @@ export type Skill = Database["public"]["Tables"]["skills"]["Row"];
 export type LearningGoal = Database["public"]["Tables"]["learning_goals"]["Row"];
 export type InterviewQuestion = Database["public"]["Tables"]["interview_questions"]["Row"];
 
+export function useCareerProfile() {
+  return useQuery({
+    queryKey: ["career_profile"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("career_profiles").select("*").maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
 export function useSkills() {
   return useQuery({
     queryKey: ["skills"],

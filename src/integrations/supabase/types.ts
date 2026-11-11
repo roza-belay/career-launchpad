@@ -95,6 +95,30 @@ export type Database = {
         }
         Relationships: []
       }
+      career_profiles: {
+        Row: {
+          headline: string
+          preferred_roles: string[]
+          summary: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          headline?: string
+          preferred_roles?: string[]
+          summary?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          headline?: string
+          preferred_roles?: string[]
+          summary?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cv_documents: {
         Row: {
           content: Json
@@ -501,6 +525,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      seed_developer_expansion: { Args: { _uid: string }; Returns: undefined }
       seed_skills_and_questions: { Args: { _uid: string }; Returns: undefined }
     }
     Enums: {

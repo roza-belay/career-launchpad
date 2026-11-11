@@ -12,7 +12,7 @@ import { usePrefs } from "@/lib/i18n";
 import { statusKey } from "@/components/app/StatusBadge";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — Career Launchpad" }, { name: "description", content: "Your job search at a glance." }, { property: "og:title", content: "Dashboard" }, { property: "og:description", content: "Your job search at a glance." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Dashboard — Career Launchpad" }, { name: "description", content: "Your job search at a glance." }, { property: "og:title", content: "Dashboard" }, { property: "og:description", content: "Your job search at a glance." }] }),
   component: Dashboard,
 });
 

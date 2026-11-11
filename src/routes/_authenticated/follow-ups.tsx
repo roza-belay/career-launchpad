@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { usePrefs } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/follow-ups")({
-  head: () => ({ meta: [{ title: "Follow-ups — Career Launchpad" }, { name: "description", content: "Upcoming and overdue follow-ups." }, { property: "og:title", content: "Follow-ups" }, { property: "og:description", content: "Upcoming and overdue follow-ups." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Follow-ups — Career Launchpad" }, { name: "description", content: "Upcoming and overdue follow-ups." }, { property: "og:title", content: "Follow-ups" }, { property: "og:description", content: "Upcoming and overdue follow-ups." }] }),
   component: FollowUpsPage,
 });
 

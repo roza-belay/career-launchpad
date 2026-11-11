@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 const META = "Track your frontend, tools and web security skills with progress bars, notes and learning goals.";
 export const Route = createFileRoute("/_authenticated/skills")({
-  head: () => ({ meta: [{ title: "Skills Development — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Skills Development" }, { property: "og:description", content: META }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Skills Development — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Skills Development" }, { property: "og:description", content: META }] }),
   component: SkillsPage,
 });
 const catKey = (c: string) => `sk.cat.${c}` as MessageKey;

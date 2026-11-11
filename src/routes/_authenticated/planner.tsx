@@ -12,7 +12,7 @@ import { usePrefs } from "@/lib/i18n";
 import { useApplications, usePlanner, usePlannerMutation } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/planner")({
-  head: () => ({ meta: [{ title: "Daily Planner — Career Launchpad" }, { name: "description", content: "Daily job search checklist and weekly goals." }, { property: "og:title", content: "Daily Planner" }, { property: "og:description", content: "Daily job search checklist and weekly goals." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Daily Planner — Career Launchpad" }, { name: "description", content: "Daily job search checklist and weekly goals." }, { property: "og:title", content: "Daily Planner" }, { property: "og:description", content: "Daily job search checklist and weekly goals." }] }),
   component: PlannerPage,
 });
 

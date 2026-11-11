@@ -13,7 +13,7 @@ import { matchesProject, PROJECT_STATUSES, type Project } from "@/lib/portfolio"
 
 const META = "Your projects with tech stack, GitHub and live demo links, plus a recruiter-ready checklist.";
 export const Route = createFileRoute("/_authenticated/portfolio/")({
-  head: () => ({ meta: [{ title: "Portfolio & Projects — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Portfolio & Projects" }, { property: "og:description", content: META }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Portfolio & Projects — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Portfolio & Projects" }, { property: "og:description", content: META }] }),
   component: PortfolioPage,
 });
 

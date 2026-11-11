@@ -15,7 +15,7 @@ import { manualChecks, projectChecklist, SCREENSHOT_BUCKET, type ManualCheck, ty
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/portfolio/$id")({
-  head: () => ({ meta: [{ title: "Project details — Career Launchpad" }, { name: "description", content: "Project details, screenshots, links and recruiter-ready checklist." }, { property: "og:title", content: "Project details" }, { property: "og:description", content: "Project details, screenshots, links and recruiter-ready checklist." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Project details — Career Launchpad" }, { name: "description", content: "Project details, screenshots, links and recruiter-ready checklist." }, { property: "og:title", content: "Project details" }, { property: "og:description", content: "Project details, screenshots, links and recruiter-ready checklist." }] }),
   component: ProjectPage,
 });
 

@@ -1,6 +1,6 @@
-export const SKILL_CATEGORIES = ["FRONTEND", "TOOLS", "SECURITY", "ADDITIONAL"] as const;
+export const SKILL_CATEGORIES = ["FRONTEND", "TOOLS", "SECURITY", "ADDITIONAL", "BACKEND", "API", "AI", "TESTING", "CLOUD", "MOBILE"] as const;
 export const SKILL_LEVELS = ["BEGINNER", "INTERMEDIATE", "ADVANCED"] as const;
-export const QUESTION_CATEGORIES = ["HTML", "CSS", "JAVASCRIPT", "REACT", "TYPESCRIPT", "HR", "OTHER"] as const;
+export const QUESTION_CATEGORIES = ["HTML", "CSS", "JAVASCRIPT", "REACT", "TYPESCRIPT", "HR", "BACKEND", "KOTLIN", "PYTHON", "NODEJS", "REST", "SQL", "AI", "TESTING", "ANDROID", "GIT", "OTHER"] as const;
 export const PRACTICE_STATUSES = ["NOT_STARTED", "PRACTICING", "CONFIDENT"] as const;
 
 export const clampProgress = (n: number) => (Number.isFinite(n) ? Math.min(100, Math.max(0, Math.round(n))) : 0);

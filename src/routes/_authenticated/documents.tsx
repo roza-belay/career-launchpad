@@ -19,7 +19,7 @@ import type { MessageKey } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/documents")({
-  head: () => ({ meta: [{ title: "CV & Documents — Career Launchpad" }, { name: "description", content: "Your Swedish and English CVs, tailored versions and PDF export." }, { property: "og:title", content: "CV & Documents" }, { property: "og:description", content: "Your Swedish and English CVs, tailored versions and PDF export." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "CV & Documents — Career Launchpad" }, { name: "description", content: "Your Swedish and English CVs, tailored versions and PDF export." }, { property: "og:title", content: "CV & Documents" }, { property: "og:description", content: "Your Swedish and English CVs, tailored versions and PDF export." }] }),
   component: DocumentsPage,
 });
 

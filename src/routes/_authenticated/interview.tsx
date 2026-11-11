@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 const META = "Practise HTML, CSS, JavaScript, React, TypeScript and HR interview questions with your own answers and practice status.";
 export const Route = createFileRoute("/_authenticated/interview")({
-  head: () => ({ meta: [{ title: "Interview Preparation — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Interview Preparation" }, { property: "og:description", content: META }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Interview Preparation — Career Launchpad" }, { name: "description", content: META }, { property: "og:title", content: "Interview Preparation" }, { property: "og:description", content: META }] }),
   component: InterviewPage,
 });
 const catKey = (c: string) => `iq.cat.${c}` as MessageKey;

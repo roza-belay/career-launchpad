@@ -9,9 +9,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Career Launchpad — Personal job search space" },
-      { name: "description", content: "Track applications, follow-ups and daily goals on the way to a first frontend developer role." },
+      { name: "description", content: "Track applications, follow-ups and daily goals on the way to a first software developer role." },
       { property: "og:title", content: "Career Launchpad" },
-      { property: "og:description", content: "A personal space to manage a frontend job search in Sweden and Europe." },
+      { property: "og:description", content: "A personal space to manage a software development job search in Sweden and Europe." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

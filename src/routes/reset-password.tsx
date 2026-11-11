@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Set new password — Career Launchpad" }, { name: "description", content: "Choose a new password." }, { property: "og:title", content: "Set new password" }, { property: "og:description", content: "Choose a new password." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "Set new password — Career Launchpad" }, { name: "description", content: "Choose a new password." }, { property: "og:title", content: "Set new password" }, { property: "og:description", content: "Choose a new password." }] }),
   component: Reset,
 });
 

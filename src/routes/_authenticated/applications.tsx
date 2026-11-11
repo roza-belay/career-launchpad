@@ -14,7 +14,7 @@ import { useApplications, useDeleteApplication, useUpdateApplication, type Appli
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/applications")({
-  head: () => ({ meta: [{ title: "My Applications — Career Launchpad" }, { name: "description", content: "Track every job application." }, { property: "og:title", content: "My Applications" }, { property: "og:description", content: "Track every job application." }] }),
+  head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "My Applications — Career Launchpad" }, { name: "description", content: "Track every job application." }, { property: "og:title", content: "My Applications" }, { property: "og:description", content: "Track every job application." }] }),
   component: ApplicationsPage,
 });
 

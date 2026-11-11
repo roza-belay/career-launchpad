@@ -43,6 +43,13 @@
       "when": 1794343961106,
       "tag": "0005_skills_and_interview",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794394196304,
+      "tag": "0006_career_profile_and_expanded_development_presets",
+      "breakpoints": true
     }
   ]
 }

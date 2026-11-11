@@ -16,6 +16,7 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to your private Career Launchpad." },
       { property: "og:title", content: "Sign in — Career Launchpad" },
       { property: "og:description", content: "Sign in to your private Career Launchpad." },
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,
