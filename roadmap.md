@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Limited Phase 2 investigation: patch-range assessment, Git/trigger/integrity proposals, synthetic two-account test plan, 46 tests and preference-control checks in PHASE2_INVESTIGATION.md
 - [x] Phase 1 follow-up review: dependency/tracking/isolation/recovery audit, four signed-in retry scenarios, 46 tests and separate preview/Git sync status documented in PHASE1_SECURITY_REVIEW.md
 - [ ] Fresh production build: manual project builds prohibited in sandbox; verify in an approved external checkout without deploying
 - [x] Phase 1 available fixes: dependency review, short-phone menu, read-error retry, CV version-switch protection, growth editing, in-session partial-save retry and screenshot error handling
