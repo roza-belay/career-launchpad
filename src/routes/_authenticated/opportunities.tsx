@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { resumableWrite } from "@/lib/recovery";
 import { ArrowRightLeft, Briefcase, CalendarClock, CheckCircle2, ExternalLink, MapPin, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/app/AppShell";
@@ -87,21 +88,28 @@ function VacancyCard({ v, apps, onEdit }: { v: Vacancy; apps: Application[]; onE
   const { t, date } = usePrefs();
   const [delOpen, setDelOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const pendingMove = useRef<(() => Promise<void>) | null>(null);
   const linked = v.application_id ? apps.find((a) => a.id === v.application_id) : undefined;
   const days = daysUntil(v.deadline, toISODate(new Date()));
 
   const del = useVacancyMutation(async () => supabase.from("vacancies").delete().eq("id", v.id), "common.deleted");
   const move = useVacancyMutation(async () => {
-    const existing = findExistingApplication(v, apps);
-    let appId = existing?.id;
-    if (!appId) {
-      const r = await supabase.from("applications").insert(vacancyToApplication(v, { deadline: t("vac.f.deadline"), type: t(etKey(v.employment_type)), skills: t("vac.f.skills") })).select("id").single();
-      if (r.error) return r;
-      appId = r.data.id;
+    if (!pendingMove.current) {
+      pendingMove.current = resumableWrite(async () => {
+        const existing = findExistingApplication(v, apps);
+        if (existing) return { id: existing.id, existing: true };
+        const r = await supabase.from("applications").insert(vacancyToApplication(v, { deadline: t("vac.f.deadline"), type: t(etKey(v.employment_type)), skills: t("vac.f.skills") })).select("id").single();
+        if (r.error) throw r.error;
+        return { id: r.data.id, existing: false };
+      }, async (app) => {
+        const r = await supabase.from("vacancies").update({ application_id: app.id }).eq("id", v.id);
+        if (r.error) throw new Error(t("common.partialSave"));
+        toast.success(t(app.existing ? "vac.linked" : "vac.moved"));
+      });
     }
-    const r = await supabase.from("vacancies").update({ application_id: appId }).eq("id", v.id);
-    if (!r.error) toast.success(t(existing ? "vac.linked" : "vac.moved"));
-    return r;
+    await pendingMove.current();
+    pendingMove.current = null;
+    return { error: null };
   });
 
   return (

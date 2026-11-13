@@ -44,7 +44,10 @@ function ProjectDetail({ project: p }: { project: Project }) {
   const text = (s: string | null) => s ? <p className="whitespace-pre-line text-sm leading-relaxed">{s}</p> : none;
 
   const del = useProjectMutation(async () => {
-    if (p.screenshots.length) await supabase.storage.from(SCREENSHOT_BUCKET).remove(p.screenshots);
+    if (p.screenshots.length) {
+      const { error } = await supabase.storage.from(SCREENSHOT_BUCKET).remove(p.screenshots);
+      if (error) throw new Error(t("pf.cleanupFailed"));
+    }
     return supabase.from("projects").delete().eq("id", p.id);
   }, "common.deleted");
   const toggle = useProjectMutation(async ({ key, value }: { key: ManualCheck; value: boolean }) =>
@@ -126,25 +129,43 @@ function Screenshots({ project: p }: { project: Project }) {
   const update = useProjectMutation(async (shots: string[]) => supabase.from("projects").update({ screenshots: shots }).eq("id", p.id));
 
   async function upload(files: FileList | null) {
-    if (!files?.length) return;
+    if (!files?.length || busy) return;
     setBusy(true);
-    const { data: { user } } = await supabase.auth.getUser();
     const added: string[] = [];
-    for (const file of Array.from(files)) {
-      if (!file.type.startsWith("image/")) { toast.error(t("pf.notImage", { n: file.name })); continue; }
-      if (file.size > 5 * 1024 * 1024) { toast.error(t("pf.tooBig", { n: file.name })); continue; }
-      const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
-      const path = `${user?.id}/${p.id}/${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from(SCREENSHOT_BUCKET).upload(path, file, { contentType: file.type });
-      if (error) toast.error(error.message); else added.push(path);
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw new Error(t("common.error"));
+      for (const file of Array.from(files)) {
+        if (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(file.type)) { toast.error(t("pf.notImage", { n: file.name })); continue; }
+        if (file.size > 5 * 1024 * 1024) { toast.error(t("pf.tooBig", { n: file.name })); continue; }
+        const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+        const path = `${user.id}/${p.id}/${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from(SCREENSHOT_BUCKET).upload(path, file, { contentType: file.type });
+        if (error) toast.error(t("common.error")); else added.push(path);
+      }
+      if (added.length) {
+        try { await update.mutateAsync([...p.screenshots, ...added]); toast.success(t("pf.uploaded")); }
+        catch {
+          // Keep originals intact; remove only newly uploaded, unattached files.
+          const { error } = await supabase.storage.from(SCREENSHOT_BUCKET).remove(added);
+          toast.error(t(error ? "pf.uploadSaveFailed" : "common.error"));
+        }
+      }
+    } catch { toast.error(t("common.error")); }
+    finally {
+      setBusy(false);
+      if (input.current) input.current.value = "";
     }
-    if (added.length) update.mutate([...p.screenshots, ...added], { onSuccess: () => toast.success(t("pf.uploaded")) });
-    setBusy(false);
-    if (input.current) input.current.value = "";
   }
   async function remove(path: string) {
-    await supabase.storage.from(SCREENSHOT_BUCKET).remove([path]);
-    update.mutate(p.screenshots.filter((s) => s !== path));
+    if (busy) return;
+    setBusy(true);
+    try {
+      const { error } = await supabase.storage.from(SCREENSHOT_BUCKET).remove([path]);
+      if (error) { toast.error(t("pf.cleanupFailed")); return; }
+      await update.mutateAsync(p.screenshots.filter((s) => s !== path));
+    } catch { toast.error(t("common.partialSave")); }
+    finally { setBusy(false); }
   }
 
   return (
@@ -154,7 +175,7 @@ function Screenshots({ project: p }: { project: Project }) {
           {p.screenshots.map((s) => (
             <div key={s} className="group relative aspect-video overflow-hidden rounded-lg border border-border bg-muted">
               {urls.data?.[s] && <a href={urls.data[s]} target="_blank" rel="noopener noreferrer"><img src={urls.data[s]} alt={p.title} className="h-full w-full object-cover object-top" /></a>}
-              <Button size="icon" variant="secondary" className="absolute right-2 top-2 size-7" aria-label={t("pf.removeShot")} onClick={() => remove(s)}><X className="size-4" /></Button>
+              <Button size="icon" variant="secondary" disabled={busy} className="absolute right-2 top-2 size-7" aria-label={t("pf.removeShot")} onClick={() => remove(s)}><X className="size-4" /></Button>
             </div>
           ))}
         </div>

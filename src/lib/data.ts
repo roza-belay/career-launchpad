@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
+import { resumableWrite } from "@/lib/recovery";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { translate } from "@/lib/i18n/core";
@@ -75,12 +77,27 @@ export function useFollowUps() {
 /** Records a confirmed follow-up: logs history, sets last contact = today (trigger moves next follow-up +7 days). */
 export function useConfirmFollowUp() {
   const qc = useQueryClient();
+  const pending = useRef(new Map<string, () => Promise<void>>());
   return useMutation({
     mutationFn: async ({ application_id, date, note }: { application_id: string; date: string; note?: string }) => {
-      const { error: e1 } = await supabase.from("follow_ups").insert({ application_id, followed_up_on: date, note: note || null });
-      if (e1) throw e1;
-      const { error: e2 } = await supabase.from("applications").update({ last_contact_date: date }).eq("id", application_id);
-      if (e2) throw e2;
+      const key = JSON.stringify([application_id, date, note]);
+      let run = pending.current.get(key);
+      if (!run) {
+        run = resumableWrite(async () => {
+          const { error } = await supabase.from("follow_ups").insert({ application_id, followed_up_on: date, note: note || null });
+          if (error) throw error;
+          return application_id;
+        }, async (id) => {
+          const { error } = await supabase.from("applications").update({ last_contact_date: date }).eq("id", id);
+          if (error) throw new Error(translate("common.partialSave"));
+        });
+        pending.current.set(key, run);
+      }
+      try { await run(); pending.current.delete(key); }
+      finally {
+        qc.invalidateQueries({ queryKey: ["applications"] });
+        qc.invalidateQueries({ queryKey: ["follow_ups"] });
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["applications"] });

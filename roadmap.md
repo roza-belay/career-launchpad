@@ -1,4 +1,9 @@
 # Roadmap
+- [x] Phase 1 available fixes: dependency review, short-phone menu, read-error retry, CV version-switch protection, growth editing, in-session partial-save retry and screenshot error handling
+- [ ] Dependency updates: refreshed scan reports advisories; compatibility review and scoped update approval required
+- [ ] Full screenshot compensation/cross-reload write recovery: requires transactional database design and failure-path integration tests
+- [ ] Secret-file exclusions blocked by platform-managed .gitignore; owner action required
+- [ ] Database atomicity deferred: requires separate migration authorization
 - [x] Broader career roles and editable private career profile
 - [x] Expanded skills and interview categories without overwriting existing records
 - [x] Genuine Career Launchpad screenshots and coordinated feature testing

@@ -1,6 +1,6 @@
 import { Link, Outlet, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Search, Briefcase, BellRing, MessagesSquare, TrendingUp, FolderGit2, FileText, CalendarCheck, Settings, LogOut, Menu, Rocket, X, Compass,
 } from "lucide-react";
@@ -39,12 +39,12 @@ export function AppShell() {
   }
 
   const sidebar = (
-    <div className="flex h-full flex-col gap-6 p-5">
+    <div className="flex h-full flex-col gap-6 overflow-y-auto p-5">
       <Link to="/dashboard" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
         <span className="flex size-9 items-center justify-center rounded-xl bg-hero text-hero-foreground"><Rocket className="size-5" /></span>
         <span className="font-display text-lg font-semibold">Career Launchpad</span>
       </Link>
-      <nav className="flex flex-1 flex-col gap-1">
+      <nav className="flex flex-1 shrink-0 flex-col gap-1">
         {NAV.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
@@ -84,10 +84,32 @@ export function AppShell() {
           <button onClick={() => setOpen(true)} aria-label={t("nav.openMenu")} className="p-1"><Menu className="size-5" /></button>
           <span className="font-display font-semibold">Career Launchpad</span>
         </header>
-        <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8"><Outlet /></main>
+        <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8"><QueryErrorNotice /><Outlet /></main>
       </div>
     </div>
   );
+}
+
+function QueryErrorNotice() {
+  const qc = useQueryClient();
+  const { t } = usePrefs();
+  const [failed, setFailed] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  useEffect(() => {
+    const cache = qc.getQueryCache();
+    const update = () => setFailed(cache.getAll().some((q) => q.getObserversCount() > 0 && q.state.status === "error"));
+    update();
+    return cache.subscribe(update);
+  }, [qc]);
+  if (!failed) return null;
+  return <div role="alert" className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive p-4">
+    <p className="text-sm">{t("common.loadFailed")}</p>
+    <Button variant="outline" disabled={retrying} onClick={async () => {
+      setRetrying(true);
+      try { await qc.refetchQueries({ type: "active", predicate: (q) => q.state.status === "error" }); }
+      finally { setRetrying(false); }
+    }}>{t("err.retry")}</Button>
+  </div>;
 }
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {

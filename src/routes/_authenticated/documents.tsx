@@ -35,6 +35,8 @@ function DocumentsPage() {
   const { t, date } = usePrefs();
   const { data: docs = [], isLoading } = useCvDocuments();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const selected = docs.find((d) => d.id === selectedId) ?? docs[0];
 
   return (
@@ -44,7 +46,7 @@ function DocumentsPage() {
         <aside className="space-y-2">
           <h2 className="px-1 text-sm font-semibold text-muted-foreground">{t("cv.versions")}</h2>
           {docs.map((d) => (
-            <button key={d.id} onClick={() => setSelectedId(d.id)}
+            <button key={d.id} onClick={() => { if (d.id === selected?.id) return; if (dirty) setPendingId(d.id); else setSelectedId(d.id); }}
               className={cn("card-soft w-full p-3 text-left transition hover:border-primary/50", selected?.id === d.id && "border-primary ring-1 ring-primary")}>
               <div className="flex items-start gap-2">
                 <FileText className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -61,13 +63,18 @@ function DocumentsPage() {
           ))}
           {!isLoading && docs.length === 0 && <p className="card-soft p-4 text-sm text-muted-foreground">{t("cv.none")}</p>}
         </aside>
-        {selected && <CvWorkspace key={selected.id} doc={selected} onCreated={setSelectedId} onDeleted={() => setSelectedId(null)} />}
+        {selected && <CvWorkspace key={selected.id} doc={selected} onDirtyChange={setDirty} onCreated={(id) => { setDirty(false); setSelectedId(id); }} onDeleted={() => { setDirty(false); setSelectedId(null); }} />}
       </div>
+      <AlertDialog open={pendingId !== null} onOpenChange={(open) => !open && setPendingId(null)}>
+        <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{t("cv.discardTitle")}</AlertDialogTitle><AlertDialogDescription>{t("cv.discardText")}</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel><AlertDialogAction onClick={() => { setSelectedId(pendingId); setPendingId(null); setDirty(false); }}>{t("cv.discard")}</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
 
-function CvWorkspace({ doc, onCreated, onDeleted }: { doc: CvDocument; onCreated: (id: string) => void; onDeleted: () => void }) {
+function CvWorkspace({ doc, onCreated, onDeleted, onDirtyChange }: { doc: CvDocument; onCreated: (id: string) => void; onDeleted: () => void; onDirtyChange: (dirty: boolean) => void }) {
   const { t } = usePrefs();
   const initial = useMemo(() => parseCv(doc.content), [doc.content]);
   const [cv, setCv] = useState<CvContent>(initial);
@@ -78,6 +85,13 @@ function CvWorkspace({ doc, onCreated, onDeleted }: { doc: CvDocument; onCreated
   useEffect(() => setMounted(true), []);
   useEffect(() => { setCv(initial); setName(doc.name); }, [initial, doc.name]);
   const dirty = name !== doc.name || JSON.stringify(cv) !== JSON.stringify(initial);
+  useEffect(() => { onDirtyChange(dirty); }, [dirty, onDirtyChange]);
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
 
   const save = useCvMutation(async () => supabase.from("cv_documents").update({ name: name.trim() || doc.name, content: clean(cv), updated_at: new Date().toISOString() }).eq("id", doc.id), "cv.saved");
   const del = useCvMutation(async () => supabase.from("cv_documents").delete().eq("id", doc.id), "common.deleted");

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/app/AppShell";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +42,8 @@ function GrowthPage() {
   const steps = nextSteps(items, today);
   const shown = items.filter((i) => i.hub === hub);
   const [title, setTitle] = useState(""); const [details, setDetails] = useState(""); const [due, setDue] = useState("");
+  const [editing, setEditing] = useState<{ id: string; title: string; details: string; target_date: string } | null>(null);
+  const edit = useKeyedMutation("growth", async (v: NonNullable<typeof editing>) => supabase.from("growth_items").update({ title: v.title.trim(), details: v.details.trim() || null, target_date: v.target_date || null, updated_at: new Date().toISOString() }).eq("id", v.id), "gr.added");
   const add = useKeyedMutation("growth", async () => supabase.from("growth_items").insert({ hub, title: title.trim(), details: details.trim() || null, target_date: due || null }), "gr.added");
   const upd = useKeyedMutation("growth", async (v: { id: string; status: string }) => supabase.from("growth_items").update({ status: v.status, updated_at: new Date().toISOString() }).eq("id", v.id));
   const del = useKeyedMutation("growth", async (id: string) => supabase.from("growth_items").delete().eq("id", id), "common.deleted");
@@ -92,7 +95,10 @@ function GrowthPage() {
           <article key={i.id} className="card-soft space-y-2 p-4">
             <div className="flex items-start justify-between gap-2">
               <h3 className={cn("font-semibold", i.status === "DONE" && "line-through opacity-70")}>{i.title}</h3>
-              <Button size="icon" variant="ghost" aria-label={t("common.delete")} onClick={() => del.mutate(i.id)}><Trash2 className="size-4" /></Button>
+              <div className="flex shrink-0">
+                <Button size="icon" variant="ghost" aria-label={t("gr.edit")} onClick={() => setEditing({ id: i.id, title: i.title, details: i.details ?? "", target_date: i.target_date ?? "" })}><Pencil className="size-4" /></Button>
+                <Button size="icon" variant="ghost" aria-label={t("common.delete")} onClick={() => del.mutate(i.id)}><Trash2 className="size-4" /></Button>
+              </div>
             </div>
             {i.details && <p className="whitespace-pre-line text-sm text-muted-foreground">{i.details}</p>}
             {i.target_date && <p className={cn("text-xs", i.status !== "DONE" && i.target_date < today ? "font-semibold text-destructive" : "text-muted-foreground")}>{t("gr.due")}: {date(i.target_date)}</p>}
@@ -105,6 +111,17 @@ function GrowthPage() {
           </article>
         ))}
       </div>
+      <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("gr.edit")}</DialogTitle></DialogHeader>
+          {editing && <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); edit.mutate(editing, { onSuccess: () => setEditing(null) }); }}>
+            <Input aria-label={t("gr.title")} value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
+            <Textarea aria-label={t("gr.details")} value={editing.details} onChange={(e) => setEditing({ ...editing, details: e.target.value })} />
+            <Input type="date" aria-label={t("gr.due")} value={editing.target_date} onChange={(e) => setEditing({ ...editing, target_date: e.target.value })} />
+            <DialogFooter><Button type="button" variant="outline" onClick={() => setEditing(null)}>{t("common.cancel")}</Button><Button disabled={!editing.title.trim() || edit.isPending}>{t("common.save")}</Button></DialogFooter>
+          </form>}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
