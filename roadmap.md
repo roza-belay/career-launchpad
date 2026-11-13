@@ -1,4 +1,7 @@
 # Roadmap
+- [x] Premium AI roadmap: inspect reusable architecture and present approval-gated plan for all seven features
+- [ ] Premium AI Phase 1: Career Coach, CV Optimizer and Interview Simulator — awaiting plan and scoped dependency approval
+- [ ] Premium AI Phase 2: cover letters, existing tracker improvements, skills gap analysis and unified progress — not authorized
 - [x] Limited Phase 2 investigation: patch-range assessment, Git/trigger/integrity proposals, synthetic two-account test plan, 46 tests and preference-control checks in PHASE2_INVESTIGATION.md
 - [x] Phase 1 follow-up review: dependency/tracking/isolation/recovery audit, four signed-in retry scenarios, 46 tests and separate preview/Git sync status documented in PHASE1_SECURITY_REVIEW.md
 - [ ] Fresh production build: manual project builds prohibited in sandbox; verify in an approved external checkout without deploying
