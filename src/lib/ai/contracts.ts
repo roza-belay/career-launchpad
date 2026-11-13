@@ -110,15 +110,42 @@ export function redactContact(text: string, map: Record<string, string> = {}) {
   return { text: out, map };
 }
 export function restoreContact<T>(value: T, map: Record<string, string>): T {
-  const fix = (v: unknown): unknown => typeof v === "string" ? v.replace(/\[CONTACT_\d+\]/g, k => map[k] ?? k) : Array.isArray(v) ? v.map(fix) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fix(x)])) : v;
+  const fix = (v: unknown): unknown => typeof v === "string" ? v.replace(/\[(?:CONTACT_\d+|NAME)\]/g, k => map[k] ?? k) : Array.isArray(v) ? v.map(fix) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fix(x)])) : v;
   return fix(value) as T;
 }
-const scrub = (v: string) => redactContact(v).text;
-/** CV copy shared with AI: no name, contact details, links or footer; inline contact text masked. */
-export function privateCv(raw: unknown): CvContent {
+const esc = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** Patterns for the CV's own name: full name, each name part (3+ letters) and initial forms like "T. Fiktivsson" or "T.F.". */
+export function namePatterns(name: string): RegExp[] {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return [];
+  const forms = new Set<string>([esc(parts.join(" ")).replace(/ /g, "\\s+")]);
+  const last = parts[parts.length - 1]!;
+  if (parts.length > 1) {
+    forms.add(`${esc(parts[0]![0]!)}\\.?\\s*${esc(last)}`);
+    forms.add(parts.map(p => `${esc(p[0]!)}\\.`).join("\\s*"));
+  }
+  parts.filter(p => p.replace(/\W/g, "").length >= 3).forEach(p => forms.add(esc(p)));
+  return [...forms].sort((a, b) => b.length - a.length).map(f => new RegExp(`(?<![\\p{L}\\p{N}])${f}(?![\\p{L}\\p{N}])`, "giu"));
+}
+export function redactName(text: string, patterns: RegExp[], map: Record<string, string>) {
+  let out = text;
+  for (const re of patterns) out = out.replace(re, () => { map["[NAME]"] = map["[NAME]"] ?? ""; return "[NAME]"; });
+  return out;
+}
+/** CV copy shared with AI plus a browser-only map to restore placeholders in suggestions. */
+export function redactCv(raw: unknown): { cv: CvContent; map: Record<string, string> } {
   const cv = cvSchema.parse(parseCv(raw));
-  return { ...cv, name: "", phone: "", email: "", links: [], footer: "", headline: scrub(cv.headline), profile: scrub(cv.profile),
-    sections: cv.sections.map(s => ({ ...s, entries: s.entries.map(e => ({ ...e, heading: scrub(e.heading), sub: scrub(e.sub), text: scrub(e.text), bullets: e.bullets.map(scrub) })) })) };
+  const map: Record<string, string> = {};
+  const names = namePatterns(cv.name);
+  const scrub = (v: string) => redactContact(redactName(v, names, map), map).text;
+  if (map["[NAME]"] !== undefined || names.length) map["[NAME]"] = cv.name.trim();
+  if (!cv.name.trim()) delete map["[NAME]"];
+  return { map, cv: { ...cv, name: "", phone: "", email: "", links: [], footer: "", headline: scrub(cv.headline), profileTitle: scrub(cv.profileTitle), profile: scrub(cv.profile),
+    sections: cv.sections.map(s => ({ ...s, title: scrub(s.title), entries: s.entries.map(e => ({ ...e, heading: scrub(e.heading), sub: scrub(e.sub), text: scrub(e.text), bullets: e.bullets.map(scrub) })) })) } };
+}
+/** CV copy shared with AI: no name, contact details, links or footer; the CV's own name and inline contact text masked. */
+export function privateCv(raw: unknown): CvContent {
+  return redactCv(raw).cv;
 }
 /** Which contact details exist (booleans only), so AI never reports them as missing. */
 export function contactPresence(raw: unknown) {

@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { usePrefs } from "@/lib/i18n";
 import { aiTask } from "@/lib/ai/tasks.functions";
-import { applySuggestion, EMPTY_CONTEXT, privateCv, type AiContext } from "@/lib/ai/contracts";
+import { applySuggestion, editableFields, EMPTY_CONTEXT, privateCv, redactCv, restoreContact, type AiContext } from "@/lib/ai/contracts";
 import type { CvContent } from "@/lib/cv";
 import { useCvMutation } from "@/lib/data";
 import { supabase } from "@/integrations/supabase/client";
@@ -168,7 +168,9 @@ export function CvOptimizer({
                   disabled={applied.includes(i) || !s.replacement.trim()}
                   onClick={() => {
                     try {
-                      onChange(applySuggestion(cv, s.path, s.original, s.replacement));
+                      const masked = redactCv(cv);
+                      if (editableFields(masked.cv)[s.path] !== s.original) throw new Error("stale");
+                      onChange(applySuggestion(cv, s.path, editableFields(cv)[s.path]!, restoreContact(s.replacement, masked.map)));
                       setApplied((a) => [...a, i]);
                     } catch {
                       toast.error(t("ai.stale"));
