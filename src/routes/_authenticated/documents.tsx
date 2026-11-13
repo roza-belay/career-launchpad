@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Copy, Download, FileText, Save, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/app/AppShell";
@@ -17,6 +17,9 @@ import { useCvDocuments, useCvMutation, type CvDocument } from "@/lib/data";
 import { usePrefs } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
+
+const CvImport = lazy(() => import("@/components/app/ai/CvImport").then(m => ({ default: m.CvImport })));
+const CvOptimizer = lazy(() => import("@/components/app/ai/CvOptimizer").then(m => ({ default: m.CvOptimizer })));
 
 export const Route = createFileRoute("/_authenticated/documents")({
   head: () => ({ meta: [{ property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }, { title: "CV & Documents — Career Launchpad" }, { name: "description", content: "Your Swedish and English CVs, tailored versions and PDF export." }, { property: "og:title", content: "CV & Documents" }, { property: "og:description", content: "Your Swedish and English CVs, tailored versions and PDF export." }] }),
@@ -37,11 +40,14 @@ function DocumentsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
   const selected = docs.find((d) => d.id === selectedId) ?? docs[0];
 
   return (
     <>
       <PageHeader title={t("nav.documents")} subtitle={t("cv.subtitle")} />
+      <Button variant="outline" className="mb-5" onClick={() => { if (!dirty || window.confirm(t("cv.discardText"))) setImportOpen(!importOpen); }}>{t("ai.import")}</Button>
+      {importOpen && <Suspense fallback={<p>{t("ai.thinking")}</p>}><CvImport onCreated={id => { setDirty(false); setSelectedId(id); setImportOpen(false); }} /></Suspense>}
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="space-y-2">
           <h2 className="px-1 text-sm font-semibold text-muted-foreground">{t("cv.versions")}</h2>
@@ -82,6 +88,7 @@ function CvWorkspace({ doc, onCreated, onDeleted, onDirtyChange }: { doc: CvDocu
   const [copyOpen, setCopyOpen] = useState(false);
   const [delOpen, setDelOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [optimize, setOptimize] = useState(false);
   useEffect(() => setMounted(true), []);
   useEffect(() => { setCv(initial); setName(doc.name); }, [initial, doc.name]);
   const dirty = name !== doc.name || JSON.stringify(cv) !== JSON.stringify(initial);
@@ -114,10 +121,12 @@ function CvWorkspace({ doc, onCreated, onDeleted, onDirtyChange }: { doc: CvDocu
         <Button onClick={() => save.mutate(undefined)} disabled={!dirty || save.isPending}><Save className="size-4" />{t("common.save")}</Button>
         <Button variant="outline" onClick={downloadPdf}><Download className="size-4" />{t("cv.pdf")}</Button>
         <Button variant="outline" onClick={() => setCopyOpen(true)}><Copy className="size-4" />{t("cv.tailor")}</Button>
+        <Button variant="outline" onClick={() => setOptimize(!optimize)}>{t("ai.optimizer")}</Button>
         {canDeleteCv(doc.kind) && <Button variant="ghost" onClick={() => setDelOpen(true)}><Trash2 className="size-4" />{t("common.delete")}</Button>}
       </div>
       {dirty && <p className="text-sm text-muted-foreground">{t("cv.unsaved")}</p>}
       <p className="text-xs text-muted-foreground">{t("cv.pdfHint")}</p>
+      {optimize && <Suspense fallback={<p>{t("ai.thinking")}</p>}><CvOptimizer cv={cv} language={doc.language} onChange={setCv} onCreated={onCreated} /></Suspense>}
 
       <div className="grid gap-6 2xl:grid-cols-2">
         <CvEditor cv={cv} onChange={setCv} />

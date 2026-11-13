@@ -14,11 +14,13 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedApplicationsRouteImport } from './routes/_authenticated/applications'
+import { Route as AuthenticatedCareerCoachRouteImport } from './routes/_authenticated/career-coach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
 import { Route as AuthenticatedFollowUpsRouteImport } from './routes/_authenticated/follow-ups'
 import { Route as AuthenticatedGrowthRouteImport } from './routes/_authenticated/growth'
 import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
+import { Route as AuthenticatedInterviewSimulatorRouteImport } from './routes/_authenticated/interview-simulator'
 import { Route as AuthenticatedOpportunitiesRouteImport } from './routes/_authenticated/opportunities'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
 import { Route as AuthenticatedPortfolioRouteRouteImport } from './routes/_authenticated/portfolio/route'
@@ -26,6 +28,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
 import { Route as AuthenticatedPortfolioIndexRouteImport } from './routes/_authenticated/portfolio/index'
 import { Route as AuthenticatedPortfolioIdRouteImport } from './routes/_authenticated/portfolio/$id'
+import { Route as ApiPublicCareerChatRouteImport } from './routes/api/public/career-chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -50,6 +53,12 @@ const AuthenticatedApplicationsRoute =
   AuthenticatedApplicationsRouteImport.update({
     id: '/applications',
     path: '/applications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCareerCoachRoute =
+  AuthenticatedCareerCoachRouteImport.update({
+    id: '/career-coach',
+    path: '/career-coach',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -77,6 +86,12 @@ const AuthenticatedInterviewRoute = AuthenticatedInterviewRouteImport.update({
   path: '/interview',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInterviewSimulatorRoute =
+  AuthenticatedInterviewSimulatorRouteImport.update({
+    id: '/interview-simulator',
+    path: '/interview-simulator',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOpportunitiesRoute =
   AuthenticatedOpportunitiesRouteImport.update({
     id: '/opportunities',
@@ -116,6 +131,11 @@ const AuthenticatedPortfolioIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedPortfolioRouteRoute,
   } as any)
+const ApiPublicCareerChatRoute = ApiPublicCareerChatRouteImport.update({
+  id: '/api/public/career-chat',
+  path: '/api/public/career-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -123,16 +143,19 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/portfolio': typeof AuthenticatedPortfolioRouteRouteWithChildren
   '/applications': typeof AuthenticatedApplicationsRoute
+  '/career-coach': typeof AuthenticatedCareerCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/follow-ups': typeof AuthenticatedFollowUpsRoute
   '/growth': typeof AuthenticatedGrowthRoute
   '/interview': typeof AuthenticatedInterviewRoute
+  '/interview-simulator': typeof AuthenticatedInterviewSimulatorRoute
   '/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
   '/portfolio/$id': typeof AuthenticatedPortfolioIdRoute
+  '/api/public/career-chat': typeof ApiPublicCareerChatRoute
   '/portfolio/': typeof AuthenticatedPortfolioIndexRoute
 }
 export interface FileRoutesByTo {
@@ -140,16 +163,19 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/applications': typeof AuthenticatedApplicationsRoute
+  '/career-coach': typeof AuthenticatedCareerCoachRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/documents': typeof AuthenticatedDocumentsRoute
   '/follow-ups': typeof AuthenticatedFollowUpsRoute
   '/growth': typeof AuthenticatedGrowthRoute
   '/interview': typeof AuthenticatedInterviewRoute
+  '/interview-simulator': typeof AuthenticatedInterviewSimulatorRoute
   '/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/skills': typeof AuthenticatedSkillsRoute
   '/portfolio/$id': typeof AuthenticatedPortfolioIdRoute
+  '/api/public/career-chat': typeof ApiPublicCareerChatRoute
   '/portfolio': typeof AuthenticatedPortfolioIndexRoute
 }
 export interface FileRoutesById {
@@ -160,16 +186,19 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRouteRouteWithChildren
   '/_authenticated/applications': typeof AuthenticatedApplicationsRoute
+  '/_authenticated/career-coach': typeof AuthenticatedCareerCoachRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
   '/_authenticated/follow-ups': typeof AuthenticatedFollowUpsRoute
   '/_authenticated/growth': typeof AuthenticatedGrowthRoute
   '/_authenticated/interview': typeof AuthenticatedInterviewRoute
+  '/_authenticated/interview-simulator': typeof AuthenticatedInterviewSimulatorRoute
   '/_authenticated/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/skills': typeof AuthenticatedSkillsRoute
   '/_authenticated/portfolio/$id': typeof AuthenticatedPortfolioIdRoute
+  '/api/public/career-chat': typeof ApiPublicCareerChatRoute
   '/_authenticated/portfolio/': typeof AuthenticatedPortfolioIndexRoute
 }
 export interface FileRouteTypes {
@@ -180,16 +209,19 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/portfolio'
     | '/applications'
+    | '/career-coach'
     | '/dashboard'
     | '/documents'
     | '/follow-ups'
     | '/growth'
     | '/interview'
+    | '/interview-simulator'
     | '/opportunities'
     | '/planner'
     | '/settings'
     | '/skills'
     | '/portfolio/$id'
+    | '/api/public/career-chat'
     | '/portfolio/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -197,16 +229,19 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/applications'
+    | '/career-coach'
     | '/dashboard'
     | '/documents'
     | '/follow-ups'
     | '/growth'
     | '/interview'
+    | '/interview-simulator'
     | '/opportunities'
     | '/planner'
     | '/settings'
     | '/skills'
     | '/portfolio/$id'
+    | '/api/public/career-chat'
     | '/portfolio'
   id:
     | '__root__'
@@ -216,16 +251,19 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/portfolio'
     | '/_authenticated/applications'
+    | '/_authenticated/career-coach'
     | '/_authenticated/dashboard'
     | '/_authenticated/documents'
     | '/_authenticated/follow-ups'
     | '/_authenticated/growth'
     | '/_authenticated/interview'
+    | '/_authenticated/interview-simulator'
     | '/_authenticated/opportunities'
     | '/_authenticated/planner'
     | '/_authenticated/settings'
     | '/_authenticated/skills'
     | '/_authenticated/portfolio/$id'
+    | '/api/public/career-chat'
     | '/_authenticated/portfolio/'
   fileRoutesById: FileRoutesById
 }
@@ -234,6 +272,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicCareerChatRoute: typeof ApiPublicCareerChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -273,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedApplicationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/career-coach': {
+      id: '/_authenticated/career-coach'
+      path: '/career-coach'
+      fullPath: '/career-coach'
+      preLoaderRoute: typeof AuthenticatedCareerCoachRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -306,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/interview'
       fullPath: '/interview'
       preLoaderRoute: typeof AuthenticatedInterviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/interview-simulator': {
+      id: '/_authenticated/interview-simulator'
+      path: '/interview-simulator'
+      fullPath: '/interview-simulator'
+      preLoaderRoute: typeof AuthenticatedInterviewSimulatorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/opportunities': {
@@ -357,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortfolioIdRouteImport
       parentRoute: typeof AuthenticatedPortfolioRouteRoute
     }
+    '/api/public/career-chat': {
+      id: '/api/public/career-chat'
+      path: '/api/public/career-chat'
+      fullPath: '/api/public/career-chat'
+      preLoaderRoute: typeof ApiPublicCareerChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -379,11 +439,13 @@ const AuthenticatedPortfolioRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPortfolioRouteRoute: typeof AuthenticatedPortfolioRouteRouteWithChildren
   AuthenticatedApplicationsRoute: typeof AuthenticatedApplicationsRoute
+  AuthenticatedCareerCoachRoute: typeof AuthenticatedCareerCoachRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
   AuthenticatedFollowUpsRoute: typeof AuthenticatedFollowUpsRoute
   AuthenticatedGrowthRoute: typeof AuthenticatedGrowthRoute
   AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
+  AuthenticatedInterviewSimulatorRoute: typeof AuthenticatedInterviewSimulatorRoute
   AuthenticatedOpportunitiesRoute: typeof AuthenticatedOpportunitiesRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -394,11 +456,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPortfolioRouteRoute:
     AuthenticatedPortfolioRouteRouteWithChildren,
   AuthenticatedApplicationsRoute: AuthenticatedApplicationsRoute,
+  AuthenticatedCareerCoachRoute: AuthenticatedCareerCoachRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
   AuthenticatedFollowUpsRoute: AuthenticatedFollowUpsRoute,
   AuthenticatedGrowthRoute: AuthenticatedGrowthRoute,
   AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
+  AuthenticatedInterviewSimulatorRoute: AuthenticatedInterviewSimulatorRoute,
   AuthenticatedOpportunitiesRoute: AuthenticatedOpportunitiesRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
@@ -413,6 +477,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicCareerChatRoute: ApiPublicCareerChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

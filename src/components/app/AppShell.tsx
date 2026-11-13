@@ -12,10 +12,12 @@ import { PreferenceControls } from "./PreferenceControls";
 
 const NAV = [
   { to: "/dashboard", label: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/career-coach", label: "ai.coach", icon: Compass },
   { to: "/opportunities", label: "nav.opportunities", icon: Search },
   { to: "/applications", label: "nav.applications", icon: Briefcase },
   { to: "/follow-ups", label: "nav.followups", icon: BellRing },
   { to: "/interview", label: "nav.interview", icon: MessagesSquare },
+  { to: "/interview-simulator", label: "ai.simulator", icon: MessagesSquare },
   { to: "/skills", label: "nav.skills", icon: TrendingUp },
   { to: "/portfolio", label: "nav.portfolio", icon: FolderGit2 },
   { to: "/documents", label: "nav.documents", icon: FileText },

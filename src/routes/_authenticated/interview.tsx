@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Lightbulb, Pencil, Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/app/AppShell";
@@ -36,6 +36,7 @@ function InterviewPage() {
   return (
     <>
       <PageHeader title={t("nav.interview")} subtitle={t("iq.subtitle")} action={<Button onClick={() => setEditing(null)}><Plus className="size-4" />{t("iq.add")}</Button>} />
+      <Button asChild variant="outline" className="mb-5"><Link to="/interview-simulator">{t("ai.simulator")}</Link></Button>
       <section className="card-soft mb-6 p-5">
         <div className="flex justify-between text-sm"><span className="font-semibold">{t("iq.ready")}</span><span className="font-bold text-primary">{pct}%</span></div>
         <Progress value={pct} className="mt-2 h-3" aria-label={t("iq.ready")} />

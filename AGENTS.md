@@ -43,5 +43,6 @@ use the editor.
 - Source-export screenshots belong in `screenshots/` only when explicitly selected for Git export; keep account uploads in private storage and never commit signed URLs; why: documentation exports must not bulk-publish personal files.
 - Career Growth Hub items share one owner-scoped `growth_items` table keyed by hub; next-step rules in `src/lib/growth.ts` (tested); why: one generic store for several planning hubs.
 - AI interview feedback runs in an authenticated server function via the AI Gateway SDK and is not stored; why: keep prompts server-side and never persist generated text as user data.
+- Career AI uses authenticated Gateway server functions and a bearer-verified streaming route; conversations remain in mounted state, reviewed outputs reuse existing owner-scoped tables, and CV parsing is browser-only; why: preserve account isolation without new schema or uploaded-source storage.
 - Multi-step browser writes use the tested resumableWrite helper to retain successful first steps while retrying in the same mounted session; why: prevent duplicate creates without claiming database atomicity or cross-reload recovery.
 - Active query failures surface through the shared app-shell warning and retry control; why: prevent silent empty-state interpretation across private pages.
