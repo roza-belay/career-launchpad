@@ -19,11 +19,13 @@ import type { optimizationSchema } from "@/lib/ai/contracts";
 type Analysis = z.infer<typeof optimizationSchema>;
 export function CvOptimizer({
   cv,
+  cvName,
   language,
   onChange,
   onCreated,
 }: {
   cv: CvContent;
+  cvName: string;
   language: string;
   onChange: (v: CvContent) => void;
   onCreated: (id: string) => void;
@@ -59,6 +61,7 @@ export function CvOptimizer({
           lang,
           context: { ...context, cvId: undefined },
           source: cv,
+          cvLanguage: language === "sv" ? "sv" : "en",
           text: "",
           role: "",
           focus: "mixed",
@@ -83,6 +86,7 @@ export function CvOptimizer({
     <section className="space-y-5 border-y py-5">
       <h2 className="text-lg font-semibold">{t("ai.optimizer")}</h2>
       <p className="text-sm text-muted-foreground">{t("ai.reviewFacts")}</p>
+      <p className="text-sm font-medium">{t("ai.analyzing")}: {cvName}</p>
       <details>
         <summary className="cursor-pointer text-sm font-medium">{t("ai.source")}</summary>
         <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-words bg-muted p-3 text-xs">
@@ -95,6 +99,7 @@ export function CvOptimizer({
         consent={consent}
         onConsent={setConsent}
         disabled={busy}
+        hideCv
       />
       <Button
         disabled={busy || !consent || (!context.vacancyId && !context.jobText.trim())}

@@ -8,6 +8,7 @@ import {
   interviewSchema,
   optimizationSchema,
   privateCv,
+  contactPresence,
   summarySchema,
   taskSchema,
 } from "./contracts";
@@ -28,9 +29,9 @@ export const aiTask = createServerFn({ method: "POST" })
         actions:
           'Return JSON {"actions":[{"title":"...","details":"..."}]} with at most six concrete steps grounded in the conversation. No dates assumed.',
         optimize:
-          'Return JSON {"analysis":"...","supported":["..."],"missing":["..."],"learning":["..."],"suggestions":[{"path":"...","original":"...","replacement":"...","reason":"..."}]}. Suggestions may address only supplied editableFields, copying original exactly. Preserve every factual detail and date, including 400 YH credits if present. Missing keywords are unknown qualifications, not claims to insert. No scores.',
+          'Return JSON {"analysis":"...","supported":["..."],"missing":["..."],"learning":["..."],"suggestions":[{"path":"...","original":"...","replacement":"...","reason":"..."}]}. Suggestions may address only supplied editableFields, copying original exactly. Preserve every factual detail and date, including 400 YH credits if present. Missing keywords are unknown qualifications, not claims to insert. No scores. contactPresent lists contact details that exist but were withheld for privacy: never report them as missing. Write analysis, lists and reasons in the reply language, but every replacement must be written in cvLanguage (the CV own language). Each reason must say which existing CV fact supports the wording; the user will verify every suggestion.',
         import:
-          "Return JSON structured CV with keys name,headline,phone,email,links:[{label,url}],profileTitle,profile,sections:[{title,entries:[{heading,sub,text,bullets:[string]}]}],footer. Extract only explicit facts from supplied text, preserve dates and education verbatim. Missing fields must be empty strings or arrays. Do not add claims or translate content.",
+          "Return JSON structured CV with keys name,headline,phone,email,links:[{label,url}],profileTitle,profile,sections:[{title,entries:[{heading,sub,text,bullets:[string]}]}],footer. Extract only explicit facts from supplied text, preserve dates and education verbatim. Missing fields must be empty strings or arrays. Keep [CONTACT_n] placeholders exactly as written and place them in the matching phone, email or links fields. Do not add claims or translate content.",
         interview: `Return JSON {"feedback":"...","question":"..."}. ${count === 0 ? "Generate the first realistic question; feedback empty." : "Give feedback on the latest answer: strengths, improvements and a stronger real-experience outline."} ${count >= 5 ? "question must be empty; five answers completed." : "Generate the next adaptive question, without repeating earlier questions."} Target role and focus are supplied.`,
         summary:
           'Return JSON {"summary":"..."} with practiced topics, strengths grounded in actual answers and next practice priorities. No numerical readiness score.',
@@ -38,7 +39,7 @@ export const aiTask = createServerFn({ method: "POST" })
       const response = await generateResponse({
         model: "openai/gpt-6-astra",
         instructions: `${factualInstructions} Reply in ${data.lang === "sv" ? "Swedish" : "English"}. ${instructions[data.operation]}`,
-        input: `Return JSON.\n${JSON.stringify({ context: selected, source, editableFields: source ? editableFields(source) : undefined, text: data.text, role: data.role, focus: data.focus, turns: data.turns })}`,
+        input: `Return JSON.\n${JSON.stringify({ context: selected, source, editableFields: source ? editableFields(source) : undefined, contactPresent: source ? contactPresence(data.source) : undefined, cvLanguage: source ? (data.cvLanguage === "sv" ? "Swedish" : "English") : undefined, text: data.text, role: data.role, focus: data.focus, turns: data.turns })}`,
         text: { format: { type: "json_object" } },
       });
       const text = response.output

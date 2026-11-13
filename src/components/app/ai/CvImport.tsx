@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { usePrefs } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n/messages";
 import { aiTask } from "@/lib/ai/tasks.functions";
-import { EMPTY_CONTEXT, validateText } from "@/lib/ai/contracts";
+import { detectCvLanguage, EMPTY_CONTEXT, fillContact, redactContact, restoreContact, validateText } from "@/lib/ai/contracts";
 import { useAiSessionGuard } from "@/lib/ai/use-session";
 import type { CvContent } from "@/lib/cv";
 import { CvEditor } from "@/components/app/CvEditor";
@@ -30,7 +30,7 @@ export function CvImport({ onCreated }: { onCreated: (id: string) => void }) {
     if (!cv) throw new Error("Missing CV");
     const r = await supabase
       .from("cv_documents")
-      .insert({ name: name.trim(), kind: "tailored", language: lang, content: cv })
+      .insert({ name: name.trim(), kind: "tailored", language: detectCvLanguage(text), content: cv })
       .select("id")
       .single();
     if (r.data && !r.error) {
@@ -67,18 +67,19 @@ export function CvImport({ onCreated }: { onCreated: (id: string) => void }) {
     setError("");
     try {
       validateText(text);
+      const masked = redactContact(text);
       const r = await run({
         data: {
           operation: "import",
           context: EMPTY_CONTEXT,
           lang,
-          text,
+          text: masked.text,
           role: "",
           focus: "mixed",
           turns: [],
         },
       });
-      if (r.kind === "import") setCv(r.value);
+      if (r.kind === "import") setCv(fillContact(restoreContact(r.value, masked.map), masked.map));
       else setError(t(r.kind === "error" && r.error === "credits" ? "ai.credits" : "ai.failed"));
     } catch {
       setError(t("ai.failed"));

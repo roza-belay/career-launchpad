@@ -46,6 +46,7 @@ export const taskSchema = z
     focus: z.enum(["mixed", "technical", "behavioral"]).default("mixed"),
     turns: z.array(turnSchema).max(12).default([]),
     source: z.unknown().optional(),
+    cvLanguage: z.enum(["en", "sv"]).optional(),
   })
   .refine((v) => v.turns.reduce((n, t) => n + t.text.length, 0) <= 60000, "Session too long");
 export type AiTask = z.infer<typeof taskSchema>;
@@ -95,9 +96,34 @@ export const cvSchema = z.object({
     .max(20),
   footer: z.string().max(500),
 });
+const CONTACT = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+|https?:\/\/\S+|www\.\S+|(?:linkedin|github)\.com\/\S+|\+?\d[\d\s().-]{6,}\d/gi;
+/** Replace e-mails, URLs and phone numbers with placeholders; the map stays in the browser. */
+export function redactContact(text: string, map: Record<string, string> = {}) {
+  const out = text.replace(CONTACT, (m) => {
+    if (/^\d{4}\s*[–-]\s*\d{4}$/.test(m.trim())) return m; // keep year ranges
+    const found = Object.entries(map).find(([, v]) => v === m);
+    if (found) return found[0];
+    const key = `[CONTACT_${Object.keys(map).length + 1}]`;
+    map[key] = m;
+    return key;
+  });
+  return { text: out, map };
+}
+export function restoreContact<T>(value: T, map: Record<string, string>): T {
+  const fix = (v: unknown): unknown => typeof v === "string" ? v.replace(/\[CONTACT_\d+\]/g, k => map[k] ?? k) : Array.isArray(v) ? v.map(fix) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, fix(x)])) : v;
+  return fix(value) as T;
+}
+const scrub = (v: string) => redactContact(v).text;
+/** CV copy shared with AI: no name, contact details, links or footer; inline contact text masked. */
 export function privateCv(raw: unknown): CvContent {
   const cv = cvSchema.parse(parseCv(raw));
-  return { ...cv, name: "", phone: "", email: "", links: [], footer: "" };
+  return { ...cv, name: "", phone: "", email: "", links: [], footer: "", headline: scrub(cv.headline), profile: scrub(cv.profile),
+    sections: cv.sections.map(s => ({ ...s, entries: s.entries.map(e => ({ ...e, heading: scrub(e.heading), sub: scrub(e.sub), text: scrub(e.text), bullets: e.bullets.map(scrub) })) })) };
+}
+/** Which contact details exist (booleans only), so AI never reports them as missing. */
+export function contactPresence(raw: unknown) {
+  const cv = cvSchema.parse(parseCv(raw));
+  return { name: !!cv.name.trim(), phone: !!cv.phone.trim(), email: !!cv.email.trim(), links: cv.links.length > 0 };
 }
 export function editableFields(cv: CvContent): Record<string, string> {
   const fields: Record<string, string> = { headline: cv.headline, profile: cv.profile };
@@ -173,4 +199,20 @@ export function validateDocxZip(buffer: ArrayBuffer) {
     pos +=
       46 + v.getUint16(pos + 28, true) + v.getUint16(pos + 30, true) + v.getUint16(pos + 32, true);
   }
+}
+/** Language of the CV text itself (not the interface): Swedish when Swedish markers dominate. */
+export function detectCvLanguage(text: string): "sv" | "en" {
+  const sv = (text.match(/[åäö]|\b(och|med|för|inom|utbildning|erfarenhet|arbetade|utvecklade)\b/gi) ?? []).length;
+  const en = (text.match(/\b(and|with|for|the|education|experience|worked|developed|built)\b/gi) ?? []).length;
+  return sv > en ? "sv" : "en";
+}
+/** Put masked contact details back into the right fields by their own shape, not by AI placement. */
+export function fillContact(cv: CvContent, map: Record<string, string>): CvContent {
+  const values = Object.values(map);
+  const email = values.find(v => v.includes("@"));
+  const phone = values.find(v => !v.includes("@") && /^\+?[\d\s().-]+$/.test(v));
+  const urls = values.filter(v => !v.includes("@") && !/^\+?[\d\s().-]+$/.test(v));
+  const clean = (v: string) => (Object.values(map).includes(v) && v !== email && v !== phone) ? "" : v;
+  return { ...cv, email: email ?? clean(cv.email), phone: phone ?? clean(cv.phone),
+    links: urls.length ? urls.map(u => ({ label: cv.links.find(l => l.url === u)?.label ?? "", url: u })) : cv.links };
 }

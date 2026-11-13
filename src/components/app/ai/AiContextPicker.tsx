@@ -23,6 +23,7 @@ export function AiContextPicker({
   onConsent,
   disabled = false,
   career = false,
+  hideCv = false,
 }: {
   value: AiContext;
   onChange: (v: AiContext) => void;
@@ -30,6 +31,7 @@ export function AiContextPicker({
   onConsent: (v: boolean) => void;
   disabled?: boolean;
   career?: boolean;
+  hideCv?: boolean;
 }) {
   const { t } = usePrefs();
   const { data: cvs = [] } = useCvDocuments();
@@ -97,7 +99,7 @@ export function AiContextPicker({
         </div>
       )}
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1">
+        {!hideCv && <div className="space-y-1">
           <Label>{t("ai.cv")}</Label>
           <Select
             disabled={disabled}
@@ -116,7 +118,7 @@ export function AiContextPicker({
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </div>}
         <div className="space-y-1">
           <Label>{t("ai.job")}</Label>
           <Select

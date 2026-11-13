@@ -67,7 +67,7 @@ export const en = {
   "ai.details": "Details",
   "ai.title": "Title",
   "ai.cvDraft": "Imported CV",
-  "ai.reviewFacts": "Check all facts, dates and qualifications before saving. AI wording is a suggestion, not verified evidence.",
+  "ai.reviewFacts": "Check all facts, dates and qualifications before saving. AI wording is a suggestion, not verified evidence. AI can be wrong — verify every suggestion against your real experience.",
   "ai.coachPrompt": "What would you like to achieve next?",
   "ai.summaryReady": "Five answers completed. End the session to request your summary.",
   "ai.copy": "Copy",
@@ -84,6 +84,7 @@ export const en = {
   "ai.retryAnswer": "Retry answer",
   "ai.resume": "Continue session",
   "ai.source": "Source CV",
+  "ai.analyzing": "CV being analysed",
   "ai.jobPaste": "Paste advertisement",
   "ai.noSuggestions": "No matching wording changes were returned. Review the analysis and evidence.",
 
@@ -540,7 +541,7 @@ export const sv: Record<MessageKey, string> = {
   "ai.details": "Detaljer",
   "ai.title": "Titel",
   "ai.cvDraft": "Importerat CV",
-  "ai.reviewFacts": "Kontrollera fakta, datum och kvalifikationer innan du sparar. AI-formuleringar är förslag, inte verifierad evidens.",
+  "ai.reviewFacts": "Kontrollera fakta, datum och kvalifikationer innan du sparar. AI-formuleringar är förslag, inte verifierad evidens. AI kan ha fel – kontrollera varje förslag mot din verkliga erfarenhet.",
   "ai.coachPrompt": "Vad vill du uppnå härnäst?",
   "ai.summaryReady": "Fem svar klara. Avsluta sessionen för att begära en sammanfattning.",
   "ai.copy": "Kopiera",
@@ -557,6 +558,7 @@ export const sv: Record<MessageKey, string> = {
   "ai.retryAnswer": "Försök med svaret igen",
   "ai.resume": "Fortsätt session",
   "ai.source": "Käll-CV",
+  "ai.analyzing": "CV som analyseras",
   "ai.jobPaste": "Klistra in annons",
   "ai.noSuggestions": "Inga matchande textförslag returnerades. Granska analysen och evidensen.",
 

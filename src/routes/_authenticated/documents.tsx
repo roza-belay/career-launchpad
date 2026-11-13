@@ -126,7 +126,7 @@ function CvWorkspace({ doc, onCreated, onDeleted, onDirtyChange }: { doc: CvDocu
       </div>
       {dirty && <p className="text-sm text-muted-foreground">{t("cv.unsaved")}</p>}
       <p className="text-xs text-muted-foreground">{t("cv.pdfHint")}</p>
-      {optimize && <Suspense fallback={<p>{t("ai.thinking")}</p>}><CvOptimizer cv={cv} language={doc.language} onChange={setCv} onCreated={onCreated} /></Suspense>}
+      {optimize && <Suspense fallback={<p>{t("ai.thinking")}</p>}><CvOptimizer cv={cv} cvName={doc.name} language={doc.language} onChange={setCv} onCreated={onCreated} /></Suspense>}
 
       <div className="grid gap-6 2xl:grid-cols-2">
         <CvEditor cv={cv} onChange={setCv} />
