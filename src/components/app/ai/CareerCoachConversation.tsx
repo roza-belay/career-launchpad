@@ -286,6 +286,11 @@ export function CareerCoachConversation() {
       >
         {planning ? t("ai.thinking") : t("ai.actions")}
       </Button>
+      {!busy && (!consent || !messages.some((m) => m.role === "assistant")) && (
+        <p className="text-sm text-muted-foreground" role="status">
+          {t(!consent ? "ai.needConsent" : "ai.needReply")}
+        </p>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         {actions.map((a, i) => (
           <article key={i} className="space-y-3 rounded-lg border bg-card p-4">
