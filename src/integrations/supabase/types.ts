@@ -119,6 +119,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_letters: {
+        Row: {
+          application_id: string | null
+          company: string | null
+          content: string
+          created_at: string
+          id: string
+          language: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id?: string | null
+          company?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          language?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          application_id?: string | null
+          company?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          language?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cover_letters_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cv_documents: {
         Row: {
           content: Json
@@ -297,6 +341,39 @@ export type Database = {
           },
         ]
       }
+      message_templates: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          language: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          language?: string
+          title: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          language?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       planner_tasks: {
         Row: {
           created_at: string
@@ -317,6 +394,33 @@ export type Database = {
           id?: string
           label?: string
           position?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_links: {
+        Row: {
+          github_url: string | null
+          linkedin_url: string | null
+          portfolio_url: string | null
+          pos_docs_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          github_url?: string | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          pos_docs_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          github_url?: string | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          pos_docs_url?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

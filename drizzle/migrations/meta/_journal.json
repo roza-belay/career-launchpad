@@ -64,6 +64,13 @@
       "when": 1794704386578,
       "tag": "0008_same_owner_links",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794903935477,
+      "tag": "0009_cover_letters_templates_profile_links",
+      "breakpoints": true
     }
   ]
 }
